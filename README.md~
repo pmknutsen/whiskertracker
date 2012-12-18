@@ -1,0 +1,21 @@
+WhiskerTracking
+==============
+
+###System Requirements###
+This software has been tested on Windows and Linux configurations and found working with Matlab 6.1 or more recent versions. Most code is written in Matlab, and some in C. The C code has been compiled under Windows XP and Linux (Ubuntu 9.04). Scripts for recompiling the C-code is included and can be adapted for other platforms.
+
+###Installing###
+To install, unpack the distribution archive and copy all directories and files to the desired path. It is advised that the original directory structure is preserved. After installing the software, add the path to the WT directory in Matlab. All WT sub-directories should be added to your path.
+
+To run the whisker tracker, type wt at the Matlab prompt.
+
+###Upgrading###
+To upgrade from a previous version, delete the entire directory where the Whisker Tracker resided and remove all paths in Matlab. Then, proceed with installation as outlined above.
+
+
+###License###
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
