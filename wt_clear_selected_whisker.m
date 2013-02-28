@@ -25,19 +25,16 @@ nCurrLine = nFigHeight;
 nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
 
 for w = 1:length(cIdents)
-    w_this = w;
-    if w > 10, w_this = w-10; end
-    if w > 20, w_this = w-20; end
-    if w > 30, w_this = w-30; end
-    if w > 40, w_this = w-40; end
     if isempty(cIdents{w}), cIdents{w}{1} = ''; end
+    nWind = rem(w,size(g_tWT.Colors,1));
+    if nWind == 0, nWind = size(g_tWT.Colors,1); end
     hBox = uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine 125 20], ...
         'Callback', '', ...
         'HorizontalAlignment', 'right', ...
         'String', cIdents{w}, ...
         'FontWeight', 'bold', ...
         'Tag', sprintf('whisker_%d_%s', w, cIdents{w}{:}), ...
-        'BackgroundColor', g_tWT.Colors(w_this,:) );
+        'BackgroundColor', g_tWT.Colors(nWind,:) );
     nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
 end
 

@@ -73,9 +73,11 @@ if ~isempty(findobj('Tag', sprintf('whisker%d', w)))
     % Redraw scatter points
     set(findobj('Tag', sprintf('scatpt%d', w)), 'XData', vX', 'YData', vY' )
 else
-    % Draw new whisker
+    % Draw whisker
+    nWind = rem(w,size(g_tWT.Colors, 1));
+    if nWind == 0, nWind = size(g_tWT.Colors,1); end
     hSpline = plot(vXX, vYY, '-', 'LineWidth', g_tWT.WhiskerWidth, ...
-        'color', g_tWT.Colors(w,:), 'Tag', sprintf('whisker%d', w));
+        'color', g_tWT.Colors(nWind, :), 'Tag', sprintf('whisker%d', w));
     hScatHand = plot(vX, vY, 'k.', 'LineWidth', 10, 'Tag', sprintf('scatpt%d', w));
     
     if ~strcmp(sOption, 'nomenu')
