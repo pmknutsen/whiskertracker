@@ -10,12 +10,24 @@ function mFrames = wt_load_avi(sFile, vFrames, varargin)
 
 warning off MATLAB:mat2cell:ObsoleteSingleInput
 
+% Discover video reader (in order of preference)
+if exist('VideoReader')
+    sVidReader = 'VideoReader';
+    bNewVidReader = 1;
+elseif exist('mmreader')
+    sVidReader = 'mmreader';
+    bNewVidReader = 1;
+else
+    sVidReader = 'aviread';
+    bNewVidReader = 0;
+end
+
 % Load frames
 try
     % On Linux, mmreader is ~7 times faster than aviread. So, if the mmreader function
     % exists on this system then use it instead of aviread. However, mmreader takes 1-2
     % sec to initialize. Thus, for a small number of frames, continue to use aviread.
-    % On PC (Windows), always use mmreader
+    % On PC (Windows), always use mmreader (or VideoReader on Matlab 2012+)
     %
     % Warning: mmreader for unknown reasons seem to return slightly
     % different matrices than aviread. In some cases, pixel values have
@@ -32,8 +44,9 @@ try
     % improvement in load speeds has been seen when the buffer is set
     % optimally.
     %
-    if ((exist('mmreader') && length(vFrames) > 50) && ~ispc) || ~exist('aviread')
-        tMov = mmreader(sFile);
+    if ((bNewVidReader && length(vFrames) > 50) && ~ispc) || ~exist('aviread')
+        %tMov = mmreader(sFile);
+        tMov = eval([sVidReader '(sFile)']);
         nNumberOfFrames = tMov.NumberOfFrames;
         nHeight = tMov.Height;
         nWidth = tMov.Width;
