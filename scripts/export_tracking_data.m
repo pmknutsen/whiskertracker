@@ -36,7 +36,9 @@ for f = 1:length(cFields)
         % Whisker names
         cNames = sWT.MovieInfo.WhiskerIdentity{1};
         for w = 1:nWhiskers
-            if isempty(cNames{w})
+            if length(cNames) < w
+                cNames{w} = {sprintf('%s_%d', cFields{f}, w)};
+            elseif isempty(cNames{w})
                 cNames{w} = {sprintf('%s_%d', cFields{f}, w)};
             end
         end
@@ -88,7 +90,9 @@ for f = 1:length(cFields)
             cNames = sWT.MovieInfo.WhiskerIdentity{1};
         else cNames = cell(1,nWhiskers); end
         for w = 1:nWhiskers
-            if isempty(cNames{w})
+            if length(cNames) < w
+                cNames{w} = {sprintf('%s_%d', cFields{f}, w)};
+            elseif isempty(cNames{w})
                 cNames{w} = {sprintf('%s_%d', cFields{f}, w)};
             end
         end

@@ -458,7 +458,7 @@ else
             'Units', 'Normalized', ...
             'Position', [vPosition(1)-0.075 vPosition(2) 0.025 vPosition(4)], ...
             'ForegroundColor', g_tWT.Colors(nWind, :), ...
-            'BackgroundColor', g_tWT.Colors(nWind, :);
+            'BackgroundColor', g_tWT.Colors(nWind, :) );
     end
 end
 return;
@@ -662,7 +662,7 @@ PrintHeader('Select whiskers', hCurrWin, nCurrLine)
 for w = 1:size(g_tWT.MovieInfo.SplinePoints, 4)
     if isempty(g_tWT.MovieInfo.SplinePoints), continue, end
     nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
-    nWind = rem(w,size(g_tWT.Colors,1)),:);
+    nWind = rem(w, size(g_tWT.Colors,1));
     if nWind == 0, nWind = size(g_tWT.Colors,1); end
     hBox = uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine 125 20], ...
         'Callback', 'wt_graphs(get(gcbo, ''Tag''), get(gcbo, ''Value''))', ... % 0=OFF, 1=ON
@@ -671,7 +671,7 @@ for w = 1:size(g_tWT.MovieInfo.SplinePoints, 4)
         'FontWeight', 'bold', ...
         'Tag', num2str(w), ...
         'foregroundColor', 'w', ...
-        'BackgroundColor', g_tWT.Colors(nWind, :);
+        'BackgroundColor', g_tWT.Colors(nWind, :) );
 end
 % Checkbox for plotting head-movements
 if ~isempty(g_tWT.MovieInfo.EyeNoseAxLen)

@@ -1,8 +1,6 @@
+function wt_rotate_frame( nDir )
 % WT_ROTATE_FRAME
 %
-
-
-function wt_rotate_frame( nDir )
 
 global g_tWT
 
@@ -36,6 +34,7 @@ end
 g_tWT.MovieInfo.SplinePoints = [];
 
 % Refresh frame
+wt_prep_gui
 wt_display_frame
 
 return

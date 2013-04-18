@@ -8,8 +8,13 @@ function [nScore, nScoreStd, nScoreN] = wt_find_next_whisker(nChWhisker, nCurren
 %           located
 %           F_prev is the previous frame
 %           IMG is a copy of the frame/image
+%
 
 global g_tWT
+persistent p_fQuadFun
+if isempty(p_fQuadFun)
+    p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
+end
 
 % Construct the velocity matrix
 %  - the velocity matrix attempts to extrapolate the new position of the
@@ -57,6 +62,29 @@ if nScore == 0
     end
     wt_set_status('WARNING: Cannot discern whisker from background. Using coordinates of previous frame.')
 else
+    % OPTIONAL:
+    % Improve tracking accuracy by interpolating position of
+    % individual spline points to the exact location whisker center
+    if 0
+    nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
+    for i = 1:size(mNewSpline, 1)
+        vXY = round(mNewSpline(i, :));
+        % Get profile of whisker shaft
+        vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
+        vY = mImg(vX, vXY(1));
+        vY = (vY-min(vY))/max(vY-min(vY));
+        vXXi = linspace(min(vX), max(vX), 20);
+        
+        %vInitParms = [max(vY) vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2 min(vY)];
+        vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
+        tOptions.MaxIter = 25;
+        vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
+        vYYi = p_fQuadFun(vB, vXXi);
+        [nMin nMinIndx] = min(vYYi);
+        mNewSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+    end
+    end
+    
     g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurrentFrame,nChWhisker) = mNewSpline;% ./ g_tWT.MovieInfo.ResizeFactor;
 end
 
@@ -69,8 +97,10 @@ end
 vX = g_tWT.MovieInfo.SplinePoints(:, 1, nCurrentFrame, nChWhisker);
 vY = g_tWT.MovieInfo.SplinePoints(:, 2, nCurrentFrame, nChWhisker);
 [vX vY] = wt_adjust_whisker_length(nChWhisker, vX, vY);
-g_tWT.MovieInfo.SplinePoints(1:size(vX,1), 1, nCurrentFrame, nChWhisker) = round(vX);
-g_tWT.MovieInfo.SplinePoints(1:size(vY,1), 2, nCurrentFrame, nChWhisker) = round(vY);
+%g_tWT.MovieInfo.SplinePoints(1:size(vX,1), 1, nCurrentFrame, nChWhisker) = round(vX);
+%g_tWT.MovieInfo.SplinePoints(1:size(vY,1), 2, nCurrentFrame, nChWhisker) = round(vY);
+g_tWT.MovieInfo.SplinePoints(1:size(vX,1), 1, nCurrentFrame, nChWhisker) = vX;
+g_tWT.MovieInfo.SplinePoints(1:size(vY,1), 2, nCurrentFrame, nChWhisker) = vY;
 
 % Constrain mid-point
 %  - user defined constraint

@@ -1,5 +1,6 @@
 function wt_track_auto(sSpeed)
 % WT_TRACK_AUTO
+%
 
 global g_tWT
 g_tWT.StopProc=0;
@@ -131,7 +132,7 @@ for nStepRange = vTrackFrames
             if bHeadIsTracked, mCurrFrame = mImg{g_tWT.MovieInfo.WhiskerSide(w)};
             else mCurrFrame = mImg; end
             [vScore(end+1), vScoreStd(end+1), nScoreN] = wt_find_next_whisker(w, nRealFrameNumber, nRealFrameNumber-1, mCurrFrame, sSpeed);
-                        
+
             % Enter manual mode if user stops execution
             if g_tWT.StopProc
                 wt_display_frame(nRealFrameNumber, mImgCroppedOnly);
