@@ -62,7 +62,7 @@ for w = nW
                 end
             end
             if ~bIsObject % no object marked for this whisker
-                wt_error('Cannot compute object distance as no object has been marked', 'warn')
+                wt_set_status('No object information')
             else
                 
                 % Compute object distance
