@@ -1,8 +1,7 @@
+function wt_reset_all
 % WT_RESET_ALL
 % Reset all movie and tracking parameters
 %
-
-function wt_reset_all
 
 % Issue warning
 sAnswer =  questdlg('This action will delete all tracked whiskers, head-movements and associated parameters. Continue?', ...

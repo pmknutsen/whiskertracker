@@ -66,6 +66,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Load Data...', 'Parent', hFile, 'Callback', ['wt_load_data(''deffile'')'], 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Save', 'Parent', hFile, 'Callback', ['wt_save_data'], 'accelerator', 'S');
     uimenu(hFrameWin, 'Label','Save As...', 'Parent', hFile, 'Callback', ['wt_save_data(''defpath'')']);
+    uimenu(hFrameWin, 'Label','Reset Current File (B)', 'Parent', hFile, 'Callback', ['wt_reset_all; wt_batch_redo(''wt_reset_all'')']);
 
     hMovies = uimenu(hFrameWin, 'Label', 'Movies', 'Parent', hFile, 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Previous...', 'Parent', hFile, 'Callback', ['wt_load_movie(-1)']);
@@ -85,28 +86,29 @@ if ~isempty(g_tWT.Movies)
     end
 
     % Whiskers
-    hMarkers = uimenu(hFrameWin, 'Label', 'Whiskers');
-    uimenu(hFrameWin, 'Label','New...', 'Parent', hMarkers, 'Callback', ['wt_mark_whisker'], 'accelerator', 'W');
-    uimenu(hFrameWin, 'Label','Paste (B)', 'Parent', hMarkers, 'Callback', ['wt_copy_paste_whisker(''paste'', NaN); wt_batch_redo(''wt_copy_paste_whisker(''''paste'''', NaN)'');'], 'accelerator', 'V');
-    uimenu(hFrameWin, 'Label','Delete...', 'Parent', hMarkers, 'Callback', ['wt_clear_selected_whisker']);
-    uimenu(hFrameWin, 'Label','Delete All (B)', 'Parent', hMarkers, 'Callback', ['wt_clear_whisker(''all''); wt_batch_redo(''wt_clear_whisker(''''all'''')'')']);
+    hWhiskers = uimenu(hFrameWin, 'Label', 'Whiskers');
+    uimenu(hFrameWin, 'Label','New...', 'Parent', hWhiskers, 'Callback', ['wt_mark_whisker'], 'accelerator', 'W');
+    uimenu(hFrameWin, 'Label','Paste (B)', 'Parent', hWhiskers, 'Callback', ['wt_copy_paste_whisker(''paste'', NaN); wt_batch_redo(''wt_copy_paste_whisker(''''paste'''', NaN)'');'], 'accelerator', 'V');
+    uimenu(hFrameWin, 'Label','Delete...', 'Parent', hWhiskers, 'Callback', ['wt_clear_selected_whisker']);
+    uimenu(hFrameWin, 'Label','Delete All (B)', 'Parent', hWhiskers, 'Callback', ['wt_clear_whisker(''all''); wt_batch_redo(''wt_clear_whisker(''''all'''')'')']);
 
-    uimenu(hFrameWin, 'Label','Track - Slow (B)', 'Parent', hMarkers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Track - Fast (B)', 'Parent', hMarkers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');']);
-    
-    uimenu(hFrameWin, 'Label','Set Last Frame...', 'Parent', hMarkers, 'Callback', ['wt_set_last_frame'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label', 'Whisker Display Width...', 'Parent', hMarkers, 'Callback', 'wt_change_whisker_width')
-    uimenu(hFrameWin, 'Label', 'Show Whisker Identities', 'Parent', hMarkers, 'Callback', 'wt_toggle_show_identity')
-    uimenu(hFrameWin, 'Label', 'Hide Whiskers', 'Parent', hMarkers, 'Callback', 'wt_toggle_whisker_visibility')
+    uimenu(hFrameWin, 'Label','Track - Slow (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Track - Fast (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');']);
     
     % Whisker labels
-    uimenu(hFrameWin, 'Label','Track Labels (B)', 'Parent', hMarkers, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Label Filter...', 'Parent', hMarkers, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
-    uimenu(hFrameWin, 'Label','Mark Whisker and Label...', 'Parent', hMarkers, 'Callback', ['wt_mark_whisker_and_label;']);
-    uimenu(hFrameWin, 'Label','Clear Labels (B)', 'Parent', hMarkers, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')']);
-    uimenu(hFrameWin, 'Label','Extend Whiskers (B)', 'Parent', hMarkers, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])']);
-    uimenu(hFrameWin, 'Label','Label Names', 'Parent', hMarkers, 'Callback', 'wt_toggle_show_label_identity')
-    
+    hLabels = uimenu(hFrameWin, 'Label', 'Whisker Labels', 'Parent', hWhiskers, 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Track Labels (B)', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')']);
+    uimenu(hFrameWin, 'Label','Label Filter...', 'Parent', hLabels, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
+    uimenu(hFrameWin, 'Label','Mark Whisker and Label...', 'Parent', hLabels, 'Callback', ['wt_mark_whisker_and_label;']);
+    uimenu(hFrameWin, 'Label','Clear Labels (B)', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')']);
+    uimenu(hFrameWin, 'Label','Extend Whiskers (B)', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])']);
+    uimenu(hFrameWin, 'Label','Label Names', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity')
+
+    uimenu(hFrameWin, 'Label','Set Last Frame...', 'Parent', hWhiskers, 'Callback', ['wt_set_last_frame'], 'Separator', 'on');
+    uimenu(hFrameWin, 'Label', 'Whisker Display Width...', 'Parent', hWhiskers, 'Callback', 'wt_change_whisker_width')
+    uimenu(hFrameWin, 'Label', 'Show Whisker Identities', 'Parent', hWhiskers, 'Callback', 'wt_toggle_show_identity')
+    uimenu(hFrameWin, 'Label', 'Hide Whiskers', 'Parent', hWhiskers, 'Callback', 'wt_toggle_whisker_visibility')
+        
     % Head related menu items
     hHead = uimenu(hFrameWin, 'Label', 'Head');
     uimenu(hFrameWin, 'Label','Track Head', 'Parent', hHead, 'Callback', ['wt_init_head_tracker']);
@@ -119,19 +121,20 @@ if ~isempty(g_tWT.Movies)
     hImage = uimenu(hFrameWin, 'Label', 'View');
     uimenu(hFrameWin, 'Label','Select ROI', 'Parent', hImage, 'Callback', ['wt_select_roi']);
     uimenu(hFrameWin, 'Label','Toggle View Mode', 'Parent', hImage, 'Callback', 'wt_toggle_display_mode');
-    uimenu(hFrameWin, 'Label','Trigger Overlays', 'Parent', hImage, 'Callback', 'wt_toggle_trigger_overlays', 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Overlay Location', 'Parent', hImage, 'Callback', 'wt_set_overlay_location');
-    uimenu(hFrameWin, 'Label','Track Trigger...', 'Parent', hImage, 'Callback', ['wt_track_stimulus']);
+
+    hTriggers = uimenu(hFrameWin, 'Label', 'Triggers', 'Parent', hImage);
+    uimenu(hFrameWin, 'Label','Show Overlays', 'Parent', hTriggers, 'Callback', 'wt_toggle_trigger_overlays');
+    uimenu(hFrameWin, 'Label','Overlay Location', 'Parent', hTriggers, 'Callback', 'wt_set_overlay_location');
+    uimenu(hFrameWin, 'Label','Track Trigger... (B)', 'Parent', hTriggers, 'Callback', ['wt_track_stimulus; wt_batch_redo(''wt_track_stimulus'')']);
+    
     uimenu(hFrameWin, 'Label','Rotate Clockwise (B)', 'Parent', hImage, 'Callback', ['wt_rotate_frame(1); wt_batch_redo(''wt_rotate_frame(1)'')'], 'Separator', 'on', 'accelerator', 'c');
     uimenu(hFrameWin, 'Label','Rotate Anti-Clockwise (B)', 'Parent', hImage, 'Callback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')'], 'accelerator', 'a');
-    uimenu(hFrameWin, 'Label','Flip Vertical (B)', 'Parent', hImage, 'Callback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')'], 'separator', 'on');
+    uimenu(hFrameWin, 'Label','Flip Vertical (B)', 'Parent', hImage, 'Callback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')']);
     uimenu(hFrameWin, 'Label','Flip Horizontal (B)', 'Parent', hImage, 'Callback', ['wt_flip_frame(''leftright''); wt_batch_redo(''wt_flip_frame(''''leftright'''')'')']);
     uimenu(hFrameWin, 'Label','Refresh', 'Parent', hImage, 'Callback', ['wt_prep_gui; wt_display_frame'], 'Separator', 'on', 'accelerator', 'R');
     uimenu(hFrameWin, 'Label','Hide', 'Parent', hImage, 'Callback', ['wt_toggle_imageshow'], 'accelerator', 'H');
     uimenu(hFrameWin, 'Label','Go To Frame...', 'Parent', hImage, 'Callback', @GoToFrame, 'accelerator', 'G');
     
-    uimenu(hFrameWin, 'Label','Reset (B)', 'Parent', hImage, 'Callback', ['wt_reset_all; wt_batch_redo(''wt_reset_all'')'], 'separator', 'on');
-
     % Measure menu
     hImage = uimenu(hFrameWin, 'Label', 'Measure');
 
@@ -142,15 +145,19 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label', 'Curvature (B)', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''curvature'', 0); wt_batch_redo(''wt_compute_kinematics(''''curvature'''',0)'');']);
     uimenu(hFrameWin, 'Label', 'Object Distance (B)', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''objectdist'', 0); wt_batch_redo(''wt_compute_kinematics(''''objectdist'''',0)'');']);
     
-    uimenu(hFrameWin, 'Label','Set Reference Angle...', 'Parent', hImage, 'Callback', 'wt_set_reference_line');
+    uimenu(hFrameWin, 'Label','Set Reference Angle...', 'Parent', hImage, 'Callback', 'wt_set_reference_line', 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Use Default Reference Angle (B)', 'Parent', hImage, 'Callback', 'wt_set_default_reference_line; wt_batch_redo(''wt_set_default_reference_line'')');
-    uimenu(hFrameWin, 'Label','Calibrate...', 'Parent', hImage, 'Callback', ['wt_calibration(''calibrate'')'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Calibrate With Image...', 'Parent', hImage, 'Callback', ['wt_calibration(''calibrate-import-image'')']);
-    uimenu(hFrameWin, 'Label','Measure Line...', 'Parent', hImage, 'Callback', ['wt_calibration(''measure'')']);
-    uimenu(hFrameWin, 'Label','Create Outline', 'Parent', hImage, 'Callback', ['wt_create_outline(''add'')'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Paste Outline (B)', 'Parent', hImage, 'Callback', ['wt_create_outline(''paste'', NaN); wt_batch_redo(''wt_create_outline(''''paste'''', NaN)'')']);
-    uimenu(hFrameWin, 'Label','Delete All Outlines (B)', 'Parent', hImage, 'Callback', ['wt_create_outline(''deleteall'', NaN); wt_batch_redo(''wt_create_outline(''''deleteall'''', NaN)'')']);
-    uimenu(hFrameWin, 'Label','Hide Outlines', 'Parent', hImage, 'Callback', ['wt_create_outline(''hide'')']);
+
+    hCalibrate = uimenu(hFrameWin, 'Label','Calibrate...', 'Parent', hImage, 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Calibrate...', 'Parent', hCalibrate, 'Callback', ['wt_calibration(''calibrate'')']);
+    uimenu(hFrameWin, 'Label','Calibrate With Image...', 'Parent', hCalibrate, 'Callback', ['wt_calibration(''calibrate-import-image'')']);
+    uimenu(hFrameWin, 'Label','Measure Line...', 'Parent', hCalibrate, 'Callback', ['wt_calibration(''measure'')']);
+    
+    hOutlines = uimenu(hFrameWin, 'Label', 'Outlines', 'Parent', hImage);
+    uimenu(hFrameWin, 'Label','Create Outline', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''add'')']);
+    uimenu(hFrameWin, 'Label','Paste Outline (B)', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''paste'', NaN); wt_batch_redo(''wt_create_outline(''''paste'''', NaN)'')']);
+    uimenu(hFrameWin, 'Label','Delete All Outlines (B)', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''deleteall'', NaN); wt_batch_redo(''wt_create_outline(''''deleteall'''', NaN)'')']);
+    uimenu(hFrameWin, 'Label','Hide Outlines', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''hide'')']);
 
 end
 
@@ -201,11 +208,7 @@ end
 
 % Help menu
 hHelp = uimenu(hFrameWin, 'Label', 'Help');
-uimenu(hFrameWin, 'Label','WT Help', 'Parent', hHelp, ...
-    'Callback', ...
-    ['hWordHandle=actxserver(''Word.Application'');set(hWordHandle,''Visible'',1);invoke(get(hWordHandle,''Documents''),''Open'',which(''WT_Help.doc''))']);
-uimenu(hFrameWin, 'Label', 'Keyboard shortcuts', 'Parent', hHelp, 'Callback', ['wt_keyboard_shortcuts']);
-uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', ['wt_get_build_number'], 'Separator', 'on');
+uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', ['wt_get_build_number']);
 uimenu(hFrameWin, 'Label','&License', 'Parent', hHelp, 'Callback', ['wt_show_license']);
 uimenu(hFrameWin, 'Label','&About WT', 'Parent', hHelp, 'Callback', ['wt_about_wt']);
 

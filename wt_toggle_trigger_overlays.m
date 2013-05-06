@@ -3,7 +3,7 @@ function wt_toggle_trigger_overlays(nStatus)
 
 global g_tWT
 
-hObj = findobj('Label', 'Trigger Overlays');
+hObj = findobj('Label', 'Show Overlays');
 
 % Update user-menu
 switch get(hObj, 'checked')

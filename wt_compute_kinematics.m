@@ -17,6 +17,8 @@ function wt_compute_kinematics(sParam, nW)
 % parameter is computed for all whiskers
 %
 
+% TODO: Remove error msg when WT fails to compute a parameter
+
 global g_tWT
 
 mSplinePoints = g_tWT.MovieInfo.SplinePoints;

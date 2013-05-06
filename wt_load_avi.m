@@ -10,6 +10,12 @@ function mFrames = wt_load_avi(sFile, vFrames, varargin)
 
 warning off MATLAB:mat2cell:ObsoleteSingleInput
 
+persistent p_bForceNewReader p_bDidAviReadCheck;
+if isempty(p_bDidAviReadCheck)
+    p_bForceNewReader = 0;
+    p_bDidAviReadCheck = 0;
+end
+
 % Discover video reader (in order of preference)
 if exist('VideoReader')
     sVidReader = 'VideoReader';
@@ -44,7 +50,23 @@ try
     % improvement in load speeds has been seen when the buffer is set
     % optimally.
     %
-    if ((bNewVidReader && length(vFrames) > 50) && ~ispc) || ~exist('aviread')
+    % Note 05/06/13: aviread, being a deprecated function, fails when
+    % reading certain AVI containers. Code was added below function
+    % that checks aviread() will read successfully. If not, then mmreader/
+    % VideoReader is selected as the default.
+    %
+
+    % Check that avireader() is capable of reading file
+    if ~p_bDidAviReadCheck
+        try
+            tFrames = aviread(sFile, 1); %#ok<*FREMO>
+        catch
+            p_bForceNewReader = 1;
+        end
+        p_bDidAviReadCheck = 1;
+    end
+    
+    if (((bNewVidReader && length(vFrames) > 50) && ~ispc) || ~exist('aviread')) || p_bForceNewReader
         %tMov = mmreader(sFile);
         tMov = eval([sVidReader '(sFile)']);
         nNumberOfFrames = tMov.NumberOfFrames;
@@ -54,6 +76,7 @@ try
         if isempty(vFrames)
             nFrames = 1:nNumberOfFrames;
         else
+            vFrames(vFrames > nNumberOfFrames) = [];
             nFrames = length(vFrames);
         end
         

@@ -23,6 +23,8 @@ if bDelWhisker
     % If XY values don't exist, try to delete the displayed whisker
     delete(findobj('Tag', sprintf('whisker%d', w))) % whisker
     delete(findobj('Tag', sprintf('scatpt%d', w))) % spline-points
+    % Delete associated whisker label
+    delete(findobj('tag', ['wt_whisker_id_' num2str(w)]));
     wt_draw_object(w, nCurrentFrame);
     return
 end
@@ -116,7 +118,7 @@ if isfield(g_tWT, 'ShowWhiskerIdentity')
         end
         hTxtSide = findobj(g_tWT.FrameAx, 'Type', 'text', 'string', sIdent);
         if isempty(hTxtSide)
-            hTxt = text(vX(1)-12, vY(1), sIdent, 'fontsize', 10, 'color', g_tWT.Colors(w,:), 'FontWeight', 'bold');
+            hTxt = text(vX(1)-12, vY(1), sIdent, 'fontsize', 10, 'color', g_tWT.Colors(w,:), 'FontWeight', 'bold', 'tag', ['wt_whisker_id_' num2str(w)]);
             set(hTxt, 'interpreter', 'none');
         else
             set(hTxtSide, 'Position', [vX(1)-12 vY(1)], 'color', g_tWT.Colors(w,:))

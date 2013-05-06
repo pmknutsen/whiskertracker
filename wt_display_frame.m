@@ -119,10 +119,6 @@ else
         % Set axis to real-size
         vImgSize = size(get(hImg, 'cdata'));
     end
-    %set(g_tWT.FrameAx, 'units', 'pixels')
-    %vPos = get(g_tWT.FrameAx, 'position');
-    %vPos = [vPos(1:2) vImgSize];
-    %set(g_tWT.FrameAx, 'position', vPos);
 end
 
 % Plot whiskers

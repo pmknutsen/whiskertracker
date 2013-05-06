@@ -15,6 +15,7 @@ persistent p_fQuadFun
 if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
+warning('off', 'stats:nlinfit:IterationLimitExceeded')
 
 % Construct the velocity matrix
 %  - the velocity matrix attempts to extrapolate the new position of the
@@ -65,7 +66,6 @@ else
     % OPTIONAL:
     % Improve tracking accuracy by interpolating position of
     % individual spline points to the exact location whisker center
-    if 0
     nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
     for i = 1:size(mNewSpline, 1)
         vXY = round(mNewSpline(i, :));
@@ -78,11 +78,11 @@ else
         %vInitParms = [max(vY) vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2 min(vY)];
         vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
         tOptions.MaxIter = 25;
+        tOptions.Display = 'off';
         vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
         vYYi = p_fQuadFun(vB, vXXi);
         [nMin nMinIndx] = min(vYYi);
         mNewSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
-    end
     end
     
     g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurrentFrame,nChWhisker) = mNewSpline;% ./ g_tWT.MovieInfo.ResizeFactor;
