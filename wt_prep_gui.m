@@ -9,7 +9,7 @@ hFrameWin = findobj('Tag', 'WTMainWindow');
 set(hFrameWin, 'color', [.8 .8 .8])
 
 figure(hFrameWin); clf; g_tWT.Handles.hSlider = [];
-set(hFrameWin, 'NumberTitle', 'off', 'Name', ['WhiskerTracker (Rev. ' wt_get_build_number ')'], ...
+set(hFrameWin, 'NumberTitle', 'off', 'Name', ['WhiskerTracker'], ...
     'resizeFcn', ['wt_resize_slider'])
 
 g_tWT.FrameAx = axes;
@@ -205,7 +205,9 @@ uimenu(hFrameWin, 'Label','WT Help', 'Parent', hHelp, ...
     'Callback', ...
     ['hWordHandle=actxserver(''Word.Application'');set(hWordHandle,''Visible'',1);invoke(get(hWordHandle,''Documents''),''Open'',which(''WT_Help.doc''))']);
 uimenu(hFrameWin, 'Label', 'Keyboard shortcuts', 'Parent', hHelp, 'Callback', ['wt_keyboard_shortcuts']);
-uimenu(hFrameWin, 'Label','About WT', 'Parent', hHelp, 'Callback', ['wt_about_wt'], 'Separator', 'on');
+uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', ['wt_get_build_number'], 'Separator', 'on');
+uimenu(hFrameWin, 'Label','&License', 'Parent', hHelp, 'Callback', ['wt_show_license']);
+uimenu(hFrameWin, 'Label','&About WT', 'Parent', hHelp, 'Callback', ['wt_about_wt']);
 
 if ~isempty(g_tWT.Movies)
     % 'Go to frame' push-button

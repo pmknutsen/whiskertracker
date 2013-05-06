@@ -1,8 +1,30 @@
 function wt
 % Whisker Tracker (WT)
-%
 % Start-up and initialize WT workspace
 %
+
+%    WhiskerTracker - Automated whiskertracking in Matlab
+%    Copyright (C) 2005-2013  Per M Knutsen <pmknutsen@gmail.com>
+%
+%    This program is free software: you can redistribute it and/or modify
+%    it under the terms of the GNU General Public License as published by
+%    the Free Software Foundation, either version 3 of the License, or
+%    (at your option) any later version.
+%
+%    This program is distributed in the hope that it will be useful,
+%    but WITHOUT ANY WARRANTY; without even the implied warranty of
+%    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%    GNU General Public License for more details.
+%
+%    You should have received a copy of the GNU General Public License
+%    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+
+clc
+disp('WhiskerTracker')
+disp('Copyright (C) 2005-2013 Per M Knutsen <pmknutsen@gmail.com>')
+disp('This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are')
+disp('are welcome to redistribute it under certain conditions; see LICENSE for details.')
 
 % Set paths
 sWT_dir = which('wt');
@@ -48,17 +70,18 @@ g_tWT.Movies = [];
 g_tWT.MovieInfo = struct('Roi', []);
 g_tWT.BatchMode = 0;
 
-g_tWT.Colors = ... % Colors look-up table
-   [  0            0         1       % 1 BLUE
-   0          0.5            0       % 2 GREEN (medium dark)
-   1            0            0       % 3 RED
-   0         0.75         0.75       % 4 TURQUOISE
-   0.75            0         0.75    % 5 MAGENTA
-   0.75         0.75            0    % 6 YELLOW (dark)
-   0.8         0.8         0.8       % 7 GREY (very bright)
-   1            0.50         0.25    % 8 ORANGE
-   0.6          0.5          0.4     % 9 BROWN
-   1            1            0  ];   % 10 YELLOW (pale)
+g_tWT.Colors = distinguishable_colors(100);
+%g_tWT.Colors = ... % Colors look-up table
+%   [  0            0         1       % 1 BLUE
+%   0          0.5            0       % 2 GREEN (medium dark)
+%   1            0            0       % 3 RED
+%   0         0.75         0.75       % 4 TURQUOISE
+%   0.75            0         0.75    % 5 MAGENTA
+%   0.75         0.75            0    % 6 YELLOW (dark)
+%   0.8         0.8         0.8       % 7 GREY (very bright)
+%   1            0.50         0.25    % 8 ORANGE
+%   0.6          0.5          0.4     % 9 BROWN
+%   1            1            0  ];   % 10 YELLOW (pale)
 
 % Look-up table for coordinates of stimulus squares
 % TODO: REMOVE THIS AND LET USER DEFINE LOCATION OF SQUARES!!!
