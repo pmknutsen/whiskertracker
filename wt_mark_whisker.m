@@ -152,12 +152,14 @@ global g_tWT
 
 nCurrFrame = get(g_tWT.Handles.hSlider, 'Value');
 mWhisker = g_tWT.MovieInfo.SplinePoints(:,:,nCurrFrame,nW);
-if size(mWhisker,1) >= 4
+if size(mWhisker, 1) >= 4
     if mWhisker(4,1) == 0
         hWarnDlg = warndlg('There are no points to delete.', 'WT Error');
         waitfor(hWarnDlg);
         return;
     end
+else
+    hWarnDlg = warndlg('None of the splinepoints can be removed from this whisker. A minimum of 3 splinepoints is required for tracking.', 'WT Error');
 end
 
 [nX, nY] = ginput(1); % get position of new object
@@ -184,8 +186,7 @@ switch nIndx
         g_tWT.MovieInfo.SplinePoints(3,:,nCurrFrame,nW) = g_tWT.MovieInfo.SplinePoints(4,:,nCurrFrame,nW);
         g_tWT.MovieInfo.SplinePoints(4,:,nCurrFrame,nW) = 0;
 end
-
-return;
+return
 
 
 %%%% SETLASTFRAME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

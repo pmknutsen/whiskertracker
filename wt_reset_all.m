@@ -32,7 +32,9 @@ g_tWT.MovieInfo.WhiskerIdentity = {};
 g_tWT.MovieInfo.LastFrame = [];
 g_tWT.MovieInfo.CalBarLength = [];
 g_tWT.MovieInfo.CalibCoords = [0 0;0 0];
-g_tWT.MovieInfo = rmfield(g_tWT.MovieInfo, 'Outlines');
+if isfield(g_tWT.MovieInfo, 'Outlines')
+    g_tWT.MovieInfo = rmfield(g_tWT.MovieInfo, 'Outlines');
+end
 
 wt_prep_gui
 wt_display_frame

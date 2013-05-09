@@ -35,7 +35,7 @@ if g_tWT.MovieInfo.UsePosExtrap % Position extrapolation matrix
         subplot(1,3,2); imagesc(mVelMat); title('VelocityMatrix')
         subplot(1,3,3); imagesc(mImg.*mVelMat); title('Original*VelocityMatrix')
     end
-else, mVelMat = ones(size(mImg)); end
+else mVelMat = ones(size(mImg)); end
 
 % DLL call
 mCurrSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nPreviousFrame, nChWhisker));% * g_tWT.MovieInfo.ResizeFactor;
@@ -48,9 +48,13 @@ else, mEnumRange = [0 g_tWT.MovieInfo.RadJitter 0; g_tWT.MovieInfo.HorJitterSlow
 if size(mCurrSpline,1) == 4
     if mCurrSpline(4,1) == 0
         mCurrSpline(4,:) = [];
-    else, mEnumRange = [mEnumRange(1,:);mEnumRange(2,:);mEnumRange(2,:);mEnumRange(3,:)]; end
+    else mEnumRange = [mEnumRange(1,:);mEnumRange(2,:);mEnumRange(2,:);mEnumRange(3,:)]; end
 end
-[mNewSpline, nScore, nScoreStd, nScoreN] = find_next_whisker(mCurrSpline, mEnumRange, mImg, g_tWT.FiltVec, mVelMat );
+try
+    [mNewSpline, nScore, nScoreStd, nScoreN] = find_next_whisker(mCurrSpline, mEnumRange, mImg, g_tWT.FiltVec, mVelMat );
+catch
+    wt_error(lasterr, 'error')
+end
 
 % TEMPORARY PATCH
 %  - when score==0, values returned by find_next_whisker may reach
@@ -61,30 +65,33 @@ if nScore == 0
     else
         g_tWT.MovieInfo.SplinePoints(:,:,nCurrentFrame,nChWhisker) = g_tWT.MovieInfo.SplinePoints(:,:,nCurrentFrame-1,nChWhisker);
     end
-    wt_set_status('WARNING: Cannot discern whisker from background. Using coordinates of previous frame.')
+    wt_set_status('Warning: Cannot discern whisker from background. Using coordinates of previous frame.')
 else
     % OPTIONAL:
     % Improve tracking accuracy by interpolating position of
     % individual spline points to the exact location whisker center
     nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
+    if 0
     for i = 1:size(mNewSpline, 1)
         vXY = round(mNewSpline(i, :));
         % Get profile of whisker shaft
         vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
-        vY = mImg(vX, vXY(1));
-        vY = (vY-min(vY))/max(vY-min(vY));
-        vXXi = linspace(min(vX), max(vX), 20);
-        
-        %vInitParms = [max(vY) vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2 min(vY)];
-        vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
-        tOptions.MaxIter = 25;
-        tOptions.Display = 'off';
-        vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
-        vYYi = p_fQuadFun(vB, vXXi);
-        [nMin nMinIndx] = min(vYYi);
-        mNewSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+        % skip if any part of the requested whisker cross-section falls outside
+        % of the frame
+        if ~(any(vX < 1) || any(vX > size(mImg, 1)))
+            vY = mImg(vX, vXY(1));
+            vY = (vY-min(vY))/max(vY-min(vY));
+            vXXi = linspace(min(vX), max(vX), 20);
+            vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
+            tOptions.MaxIter = 25;
+            tOptions.Display = 'off';
+            vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
+            vYYi = p_fQuadFun(vB, vXXi);
+            [nMin nMinIndx] = min(vYYi);
+            mNewSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+        end
     end
-    
+    end
     g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurrentFrame,nChWhisker) = mNewSpline;% ./ g_tWT.MovieInfo.ResizeFactor;
 end
 
@@ -97,8 +104,6 @@ end
 vX = g_tWT.MovieInfo.SplinePoints(:, 1, nCurrentFrame, nChWhisker);
 vY = g_tWT.MovieInfo.SplinePoints(:, 2, nCurrentFrame, nChWhisker);
 [vX vY] = wt_adjust_whisker_length(nChWhisker, vX, vY);
-%g_tWT.MovieInfo.SplinePoints(1:size(vX,1), 1, nCurrentFrame, nChWhisker) = round(vX);
-%g_tWT.MovieInfo.SplinePoints(1:size(vY,1), 2, nCurrentFrame, nChWhisker) = round(vY);
 g_tWT.MovieInfo.SplinePoints(1:size(vX,1), 1, nCurrentFrame, nChWhisker) = vX;
 g_tWT.MovieInfo.SplinePoints(1:size(vY,1), 2, nCurrentFrame, nChWhisker) = vY;
 
@@ -129,4 +134,3 @@ if sum(g_tWT.MovieInfo.MidPointConstr(:,nChWhisker)) ~= 0
 end
 
 return
-

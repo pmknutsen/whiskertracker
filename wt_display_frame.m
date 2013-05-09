@@ -95,7 +95,7 @@ else
     end
 end
 
-axes(g_tWT.FrameAx)
+%axes(g_tWT.FrameAx)
 
 % Update image axes with new video frame (or blank)
 if g_tWT.HideImage
@@ -122,7 +122,8 @@ else
 end
 
 % Plot whiskers
-axes(g_tWT.FrameAx); hold on
+%axes(g_tWT.FrameAx);
+hold(g_tWT.FrameAx, 'on');
 if ~isempty(g_tWT.MovieInfo.SplinePoints)
     for w = 1:size(g_tWT.MovieInfo.SplinePoints, 4)
         try
@@ -134,7 +135,8 @@ end
 hold off;
 
 % Plot outlines
-axes(g_tWT.FrameAx); hold on
+%axes(g_tWT.FrameAx); hold on
+hold(g_tWT.FrameAx, 'on');
 if isfield(g_tWT.MovieInfo, 'Outlines')
     for o = 1:length(g_tWT.MovieInfo.Outlines)
         wt_create_outline('draw', o);
@@ -161,7 +163,7 @@ else delete(hHead), end
 if ~isempty(g_tWT.MovieInfo.RefLine)
     hObj = findobj(g_tWT.FrameAx, 'Tag', 'reference_line');
     if isempty(hObj)    % plot reference lince if it hasn't already been
-        axes(g_tWT.FrameAx);
+        %axes(g_tWT.FrameAx);
         vLine = interp1(g_tWT.MovieInfo.RefLine(:,2), g_tWT.MovieInfo.RefLine(:,1), 1:size(mFrame,1), 'linear', 'extrap');
         hold on;
         hLine = plot(g_tWT.FrameAx, vLine, 1:size(mFrame,1), 'r', 'linewidth', 1);
