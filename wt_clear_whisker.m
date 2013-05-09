@@ -25,7 +25,9 @@ if isnumeric(vChWhiskers) && exist('vFrames', 'var') % Delete fragment of select
     try g_tWT.MovieInfo.Intersect(vFrames, :, vChWhiskers) = NaN; end
     % The following line ensures that the entire whisker is deleted below
     % if there are no tracked frames left
-    if isempty(find(g_tWT.MovieInfo.SplinePoints(:,:,:,vChWhiskers), 1)), clear(vFrames); end
+    if isempty(find(g_tWT.MovieInfo.SplinePoints(:,:,:,vChWhiskers), 1))
+        g_tWT.MovieInfo.SplinePoints(:,:,:,vChWhiskers) = [];
+    end
 end
 
 if isnumeric(vChWhiskers) && ~exist('vFrames', 'var') % Delete all frames of selected whisker

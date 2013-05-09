@@ -16,7 +16,6 @@ function wt_graphs( varargin )
 %           
 
 global g_tWT
-
 persistent p_vRefLine;
 persistent p_vPlotWhichWhiskers;
 persistent p_cActivePlots;
@@ -35,6 +34,8 @@ if nargin ~= 2
             case 'refresh'
                 p_vRefLine = [];
                 g_tWT.MovieInfo.PositionOffset = [];
+                % remove all axis from the menu dialog
+                delete(findobj(findobj('Tag', 'plotprefs'), 'type', 'axes'));
                 wt_graphs;
         end
     end

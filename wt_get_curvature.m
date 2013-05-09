@@ -21,10 +21,14 @@ for f = 1:size(mSplinePoints, 3)
     end
     vXX = vX(1):max(vX);
 
+    if ~any(vX > 0)
+        nRMax(f) = NaN;
+        continue
+    end
+    
     [vXX, vYY] = wt_spline(vX, vY, vXX);
 
     vR = [diff(vYY, 2) 0] ./ ((1 + diff(vYY).^2 ).^1.5);
-
 
     [nRMax(f), nRMaxIndx] = max(abs(vR(1:end-2)));
     nRMax(f) = vR(nRMaxIndx);
@@ -32,4 +36,4 @@ end
 
 nRMax = -nRMax';
 
-return;
+return

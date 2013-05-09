@@ -31,7 +31,7 @@ else
     nRefAngle = 90 + rad2deg( atan2( nX, nY));
 end
 
-%%% CALCULATE ANGLE
+% Calculate angle
 nFrames = size(vCoords, 3);
 for f = 1:nFrames
     mSpl = vCoords(:, :, f, 1);
@@ -62,12 +62,9 @@ for f = 1:nFrames
     end
 end
 
-%%% CALCULATE INTERSECT
+% Calculate intersect
 vInters = [ ...
     reshape(vCoords(1,1,:), size(vCoords,3), 1) ...
     reshape(vCoords(1,2,:), size(vCoords,3), 1) ];
 
 return
-
-
-
