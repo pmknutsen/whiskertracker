@@ -71,7 +71,6 @@ else
     % Improve tracking accuracy by interpolating position of
     % individual spline points to the exact location whisker center
     nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
-    if 0
     for i = 1:size(mNewSpline, 1)
         vXY = round(mNewSpline(i, :));
         % Get profile of whisker shaft
@@ -90,7 +89,6 @@ else
             [nMin nMinIndx] = min(vYYi);
             mNewSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
         end
-    end
     end
     g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurrentFrame,nChWhisker) = mNewSpline;% ./ g_tWT.MovieInfo.ResizeFactor;
 end
