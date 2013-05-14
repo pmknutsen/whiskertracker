@@ -1,6 +1,13 @@
-% wt_get_build_number
-% Returns the current hash of GIT build
-function wt_get_build_number
+function [varargout] = wt_get_build_number
+% wt_get_build_number Returns the current SHA hash of GIT build
+%
+% Usage:
+%   Display SHA hash in dialog window:
+%   wt_get_build_number()
+%
+%   Output SHA hash to variable (no display):
+%   sSHA =  wt_get_build_number()
+%
 
 % Set paths
 sWT_dir = which('wt');
@@ -25,6 +32,10 @@ elseif exist(sVERSIONPath, 'file')
     fclose(hFID);
 end
 
-inputdlg('GitHub SHA-1 Checksum:', 'WhiskerTracker Version', 1, {sHash});
+if nargout > 0
+    varargout{1} = sHash;
+else
+    inputdlg('GitHub SHA-1 Checksum:', 'WhiskerTracker Version', 1, {sHash});
+end
 
 return

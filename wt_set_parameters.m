@@ -51,6 +51,9 @@ g_tOptFields.vHeadB          = {'Point B', num2str(g_tWT.MovieInfo.RefLine(2,:))
 g_tOptFields.nFindWhiskTitle = {'Whisker tracking parameters', '', 'title', ''};
 g_tOptFields.nHorJitterSlow  = {'Horizontal jitter [left mid right] SLOW >', num2str(g_tWT.MovieInfo.HorJitterSlow), '', 'g_tWT.MovieInfo.HorJitterSlow'};
 g_tOptFields.nHorJitter      = {'Horizontal jitter [left mid right] FAST >>', num2str(g_tWT.MovieInfo.HorJitter), '', 'g_tWT.MovieInfo.HorJitter'};
+g_tOptFields.nHorJitter      = {'Horizontal jitter [left mid right] FAST >>', num2str(g_tWT.MovieInfo.HorJitter), '', 'g_tWT.MovieInfo.HorJitter'};
+g_tOptFields.nHorAutoThresh  = {'Speed-select threshold (deg)', num2str(g_tWT.MovieInfo.nHorAutoThresh), '', 'g_tWT.MovieInfo.nHorAutoThresh'};
+
 g_tOptFields.nVertJitter     = {'Radial jitter of mid-point', num2str(g_tWT.MovieInfo.RadJitter), '', 'g_tWT.MovieInfo.RadJitter'};
 g_tOptFields.nWhiskerWidth   = {'Whisker filter-width', num2str(g_tWT.MovieInfo.WhiskerWidth), '', 'g_tWT.MovieInfo.WhiskerWidth'};
 g_tOptFields.nFilterLength   = {'Width of local-angle filters', num2str(g_tWT.MovieInfo.FilterLen), '', 'g_tWT.MovieInfo.FilterLen'};

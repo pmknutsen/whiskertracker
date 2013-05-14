@@ -94,6 +94,7 @@ if ~isempty(g_tWT.Movies)
 
     uimenu(hFrameWin, 'Label','Track - Slow (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Track - Fast (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');']);
+    uimenu(hFrameWin, 'Label','Auto Select Speed (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');']);
     
     % Whisker labels
     hLabels = uimenu(hFrameWin, 'Label', 'Whisker Labels', 'Parent', hWhiskers, 'Separator', 'on');
@@ -209,6 +210,7 @@ end
 % Help menu
 hHelp = uimenu(hFrameWin, 'Label', 'Help');
 uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', ['wt_get_build_number']);
+uimenu(hFrameWin, 'Label','&Check for Updates', 'Parent', hHelp, 'Callback', ['wt_check_update']);
 uimenu(hFrameWin, 'Label','&License', 'Parent', hHelp, 'Callback', ['wt_show_license']);
 uimenu(hFrameWin, 'Label','&About WT', 'Parent', hHelp, 'Callback', ['wt_about_wt']);
 

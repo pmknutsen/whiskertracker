@@ -1,5 +1,5 @@
 function mFrames = wt_load_avi(sFile, vFrames, varargin)
-% WT_LOAD_AVI
+% wt_load_avi
 % Load specified range of frames from an AVI movie
 % wt_load_avi(FILENAME, FRAMES, OPTION), where
 %  FILENAME is the path and name of the AVI file
@@ -9,6 +9,7 @@ function mFrames = wt_load_avi(sFile, vFrames, varargin)
 %     'noresize'  don't resize frames
 
 warning off MATLAB:mat2cell:ObsoleteSingleInput
+warning off MATLAB:audiovideo:aviread:FunctionToBeRemoved
 
 persistent p_bForceNewReader p_bDidAviReadCheck;
 if isempty(p_bDidAviReadCheck)

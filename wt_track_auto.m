@@ -1,7 +1,7 @@
 function wt_track_auto(sSpeed)
-% WT_TRACK_AUTO
+% wt_track_auto
 %
-
+%
 global g_tWT
 g_tWT.StopProc=0;
 

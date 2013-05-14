@@ -15,7 +15,7 @@ function wt_load_movie(varargin)
 %
 
 global g_tWT
-
+persistent p_nCurrMov
 
 % If we are in batch mode, then save changes by default. Ask otherwise.
 bAsk = 1;
@@ -40,8 +40,6 @@ if isfield(g_tWT.MovieInfo, 'FilenameUncompressed')
         delete(g_tWT.MovieInfo.FilenameUncompressed);
     end
 end
-
-persistent p_nCurrMov;
 
 if isempty(varargin)
     return;
@@ -79,22 +77,36 @@ else
     end
 end
 
-% Load AVI info (if it exists)
-if strcmp(sFileName(end-3:end), '.avi')
-    if exist(sFileName, 'file'), g_tWT.MovieInfo = aviinfo(sFileName);
-    else wt_error(sprintf('Cannot read %s', wt_check_path(sFileName))); end
+% Load info form video file (if it exists)
+if exist(sFileName, 'file')
+    tMovieInfo = struct([]);
+    if exist('VideoReader')
+        clInfo = VideoReader(sFileName);
+    elseif exist('mmreader')
+        clInfo = mmreader(sFileName);
+    end
+    if exist('clInfo')
+        tMovieInfo(1).Filename = sFileName;
+        tMovieInfo(1).NumFrames = clInfo.NumberOfFrames;
+        tMovieInfo(1).FramesPerSecond = clInfo.FrameRate;
+        tMovieInfo(1).Width = clInfo.Width;
+        tMovieInfo(1).Height = clInfo.Height;
+        tMovieInfo(1).ImageType = clInfo.VideoFormat;
+    else
+        tMovieInfo = aviinfo(sFileName);
+    end
+    g_tWT.MovieInfo = tMovieInfo;
+else
+    wt_error(sprintf('Cannot read %s', wt_check_path(sFileName)));
 end
 
-% Initialize parameters with default values
-if strcmp(sFileName(end-3:end), '.avi')
-    g_tWT.MovieInfo.Roi = [1 1 g_tWT.MovieInfo.Width-1 g_tWT.MovieInfo.Height-1];
-    g_tWT.MovieInfo.ImCropSize = [g_tWT.MovieInfo.Width g_tWT.MovieInfo.Height];
-end
+% Default tracking parameters
+g_tWT.MovieInfo.Roi = [1 1 g_tWT.MovieInfo.Width-1 g_tWT.MovieInfo.Height-1];
+g_tWT.MovieInfo.ImCropSize = [g_tWT.MovieInfo.Width g_tWT.MovieInfo.Height];
 g_tWT.MovieInfo.FilenameUncompressed = [];
 g_tWT.MovieInfo.Rot = 0;
 g_tWT.MovieInfo.Flip = [0 0];
 g_tWT.MovieInfo.Invert = 0;
-%g_tWT.MovieInfo.ResizeFactor = 1;
 g_tWT.MovieInfo.SplinePoints = [];
 g_tWT.MovieInfo.WhiskerSide = [];
 g_tWT.MovieInfo.Angle = [];
@@ -103,6 +115,7 @@ g_tWT.MovieInfo.Intersect = [];
 g_tWT.MovieInfo.AngleDelta = 0;
 g_tWT.MovieInfo.HorJitter = [1 2 3];
 g_tWT.MovieInfo.HorJitterSlow = [1 1 1];
+g_tWT.MovieInfo.nHorAutoThresh = 100;
 g_tWT.MovieInfo.RadJitter = 1;
 g_tWT.MovieInfo.RefLine = [0 1; 0 2];
 g_tWT.MovieInfo.ViewMag = 1;
@@ -153,14 +166,12 @@ if strcmp(sFileName(end-3:end), '.mat') % is .mat
     end
 end
 
-
 % Reset the averaged frame
 wt_subtract_bg_frame('reset');
 
 % Load previously collected data
 % If that fails (e.g. if there is none), then attempt to load the default
 % parameters file (wt_default_parameteres)
-
 try
     wt_load_data
 catch
@@ -176,25 +187,19 @@ catch
     end
 end
 
-% We set it here, in case movies with saved data are moved around
-g_tWT.MovieInfo.Filename = [sFileName(1:end-4) '.avi'];
+% Re-insert parameters from file info structure
+g_tWT.MovieInfo.FramesPerSecond = tMovieInfo.FramesPerSecond;
+g_tWT.MovieInfo.NumFrames = tMovieInfo.NumFrames;
+g_tWT.MovieInfo.Width = tMovieInfo.Width;
+g_tWT.MovieInfo.Height = tMovieInfo.Height;
 
-% Re-load parameters and make sure that g_tWT.MovieInfo contains correct AVI
-% info
-if strcmp(sFileName(end-3:end), '.avi')
-    tMovieInfo = aviinfo(g_tWT.MovieInfo.Filename);
-    g_tWT.MovieInfo.FramesPerSecond = tMovieInfo.FramesPerSecond;
-    g_tWT.MovieInfo.NumFrames = tMovieInfo.NumFrames;
-    g_tWT.MovieInfo.Width = tMovieInfo.Width;
-    g_tWT.MovieInfo.Height = tMovieInfo.Height;
-    if ~isfield(g_tWT.MovieInfo, 'CalBarLength'), g_tWT.MovieInfo.CalBarLength = []; end
-    if ~isfield(g_tWT.MovieInfo, 'CalibCoords'), g_tWT.MovieInfo.CalibCoords = [0 0;0 0];    end
-    g_tWT.MovieInfo.FilenameUncompressed = [];
+if ~isfield(g_tWT.MovieInfo, 'CalBarLength'), g_tWT.MovieInfo.CalBarLength = []; end
+if ~isfield(g_tWT.MovieInfo, 'CalibCoords'), g_tWT.MovieInfo.CalibCoords = [0 0;0 0];    end
+g_tWT.MovieInfo.FilenameUncompressed = [];
 
-    % Initialize image buffer
-    g_tWT.CurrentFrameBuffer.Img   = [];
-    g_tWT.CurrentFrameBuffer.Frame = 1;
-end
+% Initialize image buffer
+g_tWT.CurrentFrameBuffer.Img   = [];
+g_tWT.CurrentFrameBuffer.Frame = 1;
 
 % Display frame number 1, or the first frame where head-position is known
 wt_prep_gui
