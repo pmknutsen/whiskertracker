@@ -29,9 +29,11 @@ disp('are welcome to redistribute it under certain conditions; see LICENSE for d
 % Set paths
 sWT_dir = which('wt');
 sWT_dir = sWT_dir(1:findstr(sWT_dir, 'wt.m')-1);
-sWT_bin_path = sprintf('%sbin/', sWT_dir);
 path(path, sWT_dir)
-path(path, sWT_bin_path)
+path(path, sprintf('%sbin/', sWT_dir))
+path(path, sprintf('%slib/', sWT_dir))
+path(path, sprintf('%sicons/', sWT_dir))
+path(path, sprintf('%sscripts/', sWT_dir))
 
 % Start WT if not already running
 hFig = findobj('CloseRequestFcn', 'wt_exit');

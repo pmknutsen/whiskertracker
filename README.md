@@ -20,7 +20,11 @@ Increase tracking speeds significantly by batch processing simultaneously with m
 * Run batch jobs from multiple CPUs/cores
 
 ##System Requirements
-WhiskerTracker runs in Matlab versions 6.1 and newer. C code has been compiled for Windows and Linux.
+Matlab 2012b or higher recommended (will also run on 6.1 or higher)
+Compiled binaries are included for Windows and Linux (32-bit Matlab)
+
+Note that 64-bit Matlab is currently not supported. C source-code is included and may be compiled
+(and then shared!) for 64-bit Matlab (and Mac) with minor modifications.
 
 ##License
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
