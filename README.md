@@ -21,7 +21,9 @@ Increase tracking speeds significantly by batch processing simultaneously with m
 
 ##System Requirements
 Matlab 2012b or higher recommended (will also run on 6.1 or higher)
+
 Statistics Toolbox
+
 Compiled binaries are included for Windows and Linux (32-bit Matlab)
 
 Note that 64-bit Matlab is currently not supported. C source-code is included and may be compiled
