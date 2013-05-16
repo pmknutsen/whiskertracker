@@ -27,7 +27,11 @@ Statistics Toolbox
 Compiled binaries are included for Windows and Linux (32-bit Matlab)
 
 Note that 64-bit Matlab is currently not supported. C source-code is included and may be compiled
-(and then shared!) for 64-bit Matlab (and Mac) with minor modifications.
+(and then shared!) for 64-bit Matlab (or Mac) with minor modifications.
+
+##Reference
+Please cite any use of this work as:
+>"Knutsen, Derdikman & Ahissar (2005) “Tracking Whisker and Head Movements in Unrestrained Behaving Rodents.” Journal of Neurophysiology 93 (4) 2294–301."
 
 ##License
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
