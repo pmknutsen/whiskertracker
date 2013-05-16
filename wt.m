@@ -26,6 +26,9 @@ disp('Copyright (C) 2005-2013 Per M Knutsen <pmknutsen@gmail.com>')
 disp('This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are')
 disp('are welcome to redistribute it under certain conditions; see LICENSE for details.')
 
+disp(sprintf('\nPlease cite the following reference in any publication using this work:\nKnutsen, Derdikman & Ahissar (2005) Journal of Neurophysiology 93 (4) 2294–301.\n'))
+
+
 % Set paths
 sWT_dir = which('wt');
 sWT_dir = sWT_dir(1:findstr(sWT_dir, 'wt.m')-1);
