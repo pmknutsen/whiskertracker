@@ -18,6 +18,7 @@ if isempty(p_fQuadFun)
 end
 
 warning('off', 'stats:nlinfit:IterationLimitExceeded')
+warning('off', 'stats:nlinfit:IllConditionedJacobian')
 
 % Construct the velocity matrix
 %  - the velocity matrix attempts to extrapolate the new position of the
@@ -58,9 +59,9 @@ if strcmp(sSpeed, 'auto') % auto-select range
     g_tWT.MovieInfo.Angle(nPrevFrame, nChWhisker) = nA;
     g_tWT.MovieInfo.Intersect(nPrevFrame, 1:2, nChWhisker) = nI;
     if nA < g_tWT.MovieInfo.nHorAutoThresh
-        sSpeed = 'slow'
+        sSpeed = 'slow';
     else
-        sSpeed = 'fast'
+        sSpeed = 'fast';
     end
 end
 
