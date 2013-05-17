@@ -44,10 +44,10 @@ uipushtool('Parent', hToolbar, 'cdata', mCData_orig, 'Tag', 'Spiky_WaitbarAction
 mCData = im2double(imread([sPath 'tool_plottools_show.png'])); mCData(mCData == 0) = NaN;
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Auto-resize window', 'ClickedCallback', ['wt_autosize_window']);
 
-[mCData, mCM] = imread([sPath 'right.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''slow'')'], 'separator', 'on');
+[mCData, mCM] = imread([sPath 'right.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking SLOW
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''slow'')']);
 
-[mCData, mCM] = imread([sPath 'right_double.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking
+[mCData, mCM] = imread([sPath 'right_double.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking FAST
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track FAST', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''fast'')']);
 
 mCData = im2double(imread([sPath 'cancel.png'])); mCData(mCData == 0) = NaN;
@@ -95,6 +95,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Track - Slow (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Track - Fast (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');']);
     uimenu(hFrameWin, 'Label','Auto Select Speed (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');']);
+    uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', ['wt_set_tracking_range()']);
     
     % Whisker labels
     hLabels = uimenu(hFrameWin, 'Label', 'Whisker Labels', 'Parent', hWhiskers, 'Separator', 'on');
