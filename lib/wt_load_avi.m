@@ -68,7 +68,6 @@ try
     end
     
     if (((bNewVidReader && length(vFrames) > 50) && ~ispc) || ~exist('aviread')) || p_bForceNewReader
-        %tMov = mmreader(sFile);
         tMov = eval([sVidReader '(sFile)']);
         nNumberOfFrames = tMov.NumberOfFrames;
         nHeight = tMov.Height;
@@ -86,15 +85,17 @@ try
         
         % Read frames one at a time
         for k = 1:length(vFrames)
-            tFrames(k).cdata = read(tMov, vFrames(k));
-            % mmreader always(?) reads frames as RGB.
-            % Force conversion to grayscale using the standard NTSC
-            % conversion formula used for calculating the effective
-            % luminance of a pixel
-            %mGray = 0.2989 * tFrames(k).cdata(:,:,1) + 0.5870 ...
-            %    * tFrames(k).cdata(:,:,2) + 0.1140 ...
-            %    * tFrames(k).cdata(:,:,3); 
-            %tFrames(k).cdata = mGray;
+            try
+                tFrames(k).cdata = read(tMov, vFrames(k));
+            catch
+                wt_set_status(sprintf('Warning: Frame %d could not be read. The file could be damaged.', vFrames(k)))
+                if length(tFrames) > 2
+                    tFrames(k).cdata = tFrames(k-1).cdata;
+                else
+                    global g_tWT;
+                    tFrames(k).cdata = g_tWT.CurrentFrameBuffer.Img;
+                end
+            end
         end
     else
         % Use aviread on older systems
