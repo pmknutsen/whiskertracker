@@ -95,11 +95,14 @@ return
 % Close range selection dialog
 function CloseRangeWin(varargin)
 global g_tWT
-
-% Delete range indicator in main window
-hObjSlow = findobj(g_tWT.WTWindow, 'tag', 'spline_range_indicator_slow');
-hObjFast = findobj(g_tWT.WTWindow, 'tag', 'spline_range_indicator_fast');
-delete([hObjSlow hObjFast])
+if ~isempty(g_tWT)
+    if ishandle(g_tWT.WTWindow)
+        % Delete range indicator in main window
+        hObjSlow = findobj(g_tWT.WTWindow, 'tag', 'spline_range_indicator_slow');
+        hObjFast = findobj(g_tWT.WTWindow, 'tag', 'spline_range_indicator_fast');
+        delete([hObjSlow hObjFast])
+    end
+end
 
 delete(gcbo)
 
