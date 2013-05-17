@@ -3,6 +3,7 @@ function wt_set_tracking_range
 % Set the movement range of whisker splines interactively
 
 global g_tWT
+set(g_tWT.WTWindow, 'renderer', 'openGL')
 
 % Create dialog with +/- buttons
 hFig = figure;
@@ -21,9 +22,6 @@ uicontrol(hFig, 'style', 'pushbutton', 'position', [120 10 30 30], 'string', '-'
 
 UpdateRanges()
 
-% TODO:
-%  - Ok button
-
 return
 
 % Auxillary functions
@@ -34,17 +32,19 @@ global g_tWT
 vSlow = g_tWT.MovieInfo.HorJitterSlow;
 vFast = g_tWT.MovieInfo.HorJitter;
 sTag = get(gcbo, 'tag');
-switch sTag(6:7)
-    case 'up'
-        nCh = 1;
-    case 'dn'
-        nCh = -1;
-end
-switch sTag(1:4)
-    case 'slow'
-        vSlow = vSlow + nCh;
-    case 'fast'
-        vFast = vFast + nCh;
+if ~isempty(sTag)
+    switch sTag(6:7)
+        case 'up'
+            nCh = 1;
+        case 'dn'
+            nCh = -1;
+    end
+    switch sTag(1:4)
+        case 'slow'
+            vSlow = vSlow + nCh;
+        case 'fast'
+            vFast = vFast + nCh;
+    end
 end
 
 % Verify ranges are not negative
