@@ -17,8 +17,6 @@ function wt_compute_kinematics(sParam, nW)
 % parameter is computed for all whiskers
 %
 
-% TODO: Remove error msg when WT fails to compute a parameter
-
 global g_tWT
 
 mSplinePoints = g_tWT.MovieInfo.SplinePoints;
@@ -30,7 +28,7 @@ for w = nW
     % Splinepoints of current whisker
     mSplinePointsThis = mSplinePoints(:,:,:,w);
     if strcmp(sParam, 'angle') || strcmp(sParam, 'all')
-            wt_set_status('Computing whisker angle')
+            wt_set_status('Computing whisker angle...')
             % Compute angle
             [vAngle vIntersect] = wt_get_angle(mSplinePointsThis, g_tWT.MovieInfo.RefLine, g_tWT.MovieInfo.AngleDelta);
             % Assign values
@@ -40,7 +38,7 @@ for w = nW
             end
     end
     if strcmp(sParam, 'curvature') || strcmp(sParam, 'all')
-            wt_set_status('Computing whisker curvature')
+            wt_set_status('Computing whisker curvature...')
             % Compute curvature
             if g_tWT.MovieInfo.AngleDelta == 0
                 vCurvature = wt_get_curv_at_base(mSplinePointsThis);
@@ -51,7 +49,7 @@ for w = nW
             g_tWT.MovieInfo.Curvature(1:length(vCurvature), w) = vCurvature;
     end
     if strcmp(sParam, 'objectdist') || strcmp(sParam, 'all')
-            wt_set_status('Computing whisker distance from object')
+            wt_set_status('Computing whisker distance from object...')
             
             % Head-movements are tracked
             bIsObject = 0;

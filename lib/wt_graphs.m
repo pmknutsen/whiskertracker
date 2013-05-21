@@ -16,10 +16,7 @@ function wt_graphs( varargin )
 %           
 
 global g_tWT
-persistent p_vRefLine;
-persistent p_vPlotWhichWhiskers;
-persistent p_cActivePlots;
-persistent p_nAngleDelta;
+persistent p_vRefLine p_vPlotWhichWhiskers p_cActivePlots p_nAngleDelta
 
 % Determine which plots to show
 if nargin ~= 2
@@ -376,7 +373,8 @@ else
                 else
                     g_tWT.MovieInfo.Curvature(vMissingFrames, p_vPlotWhichWhiskers(w)) = wt_get_curvature(mSplinePoints);
                 end
-                g_tWT.MovieInfo.Curvature([1:vMissingFrames(1) vMissingFrames(end):end], p_vPlotWhichWhiskers(w)) = NaN;
+                vIsZeroIndx = g_tWT.MovieInfo.Curvature(:, p_vPlotWhichWhiskers(w)) == 0;
+                g_tWT.MovieInfo.Curvature(vIsZeroIndx, p_vPlotWhichWhiskers(w)) = NaN;
             end
 
             vCurvature = g_tWT.MovieInfo.Curvature(:, p_vPlotWhichWhiskers(w));
@@ -462,7 +460,7 @@ else
             'BackgroundColor', g_tWT.Colors(nWind, :) );
     end
 end
-return;
+return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function PrintHeader( sHeader , hWindow , nYpos )
@@ -629,10 +627,11 @@ nFigWidth = 150;
 vFigPos = [5 vScrnSize(4)-(nFigHeight+21) nFigWidth nFigHeight];
 hCurrWin = figure;
 set(hCurrWin, 'NumberTitle', 'off', ...
-    'Name', 'WT Menu', ...
+    'Name', 'WT', ...
     'Position', vFigPos, ...
     'MenuBar', 'none', ...
     'Tag', 'plotprefs', ...
+    'Resize', 'off', ...
     'CloseRequestFcn', 'wt_graphs(''close''); closereq;' )
 % Place text string and boxes inside window
 nCurrLine = nFigHeight;
