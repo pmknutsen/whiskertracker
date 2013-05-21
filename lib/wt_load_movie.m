@@ -77,27 +77,29 @@ else
     end
 end
 
-% Load info form video file (if it exists)
-if exist(sFileName, 'file')
-    tMovieInfo = struct([]);
-    if exist('VideoReader')
-        clInfo = VideoReader(sFileName);
-    elseif exist('mmreader')
-        clInfo = mmreader(sFileName);
-    end
-    if exist('clInfo')
-        tMovieInfo(1).Filename = sFileName;
-        tMovieInfo(1).NumFrames = clInfo.NumberOfFrames;
-        tMovieInfo(1).FramesPerSecond = clInfo.FrameRate;
-        tMovieInfo(1).Width = clInfo.Width;
-        tMovieInfo(1).Height = clInfo.Height;
-        tMovieInfo(1).ImageType = clInfo.VideoFormat;
+% Load info from video file (if it exists), UNLESS user selected a .mat file
+if ~strcmp(sFileName(end-3:end), '.mat')
+    if exist(sFileName, 'file')
+        tMovieInfo = struct([]);
+        if exist('VideoReader')
+            clInfo = VideoReader(sFileName);
+        elseif exist('mmreader')
+            clInfo = mmreader(sFileName);
+        end
+        if exist('clInfo')
+            tMovieInfo(1).Filename = sFileName;
+            tMovieInfo(1).NumFrames = clInfo.NumberOfFrames;
+            tMovieInfo(1).FramesPerSecond = clInfo.FrameRate;
+            tMovieInfo(1).Width = clInfo.Width;
+            tMovieInfo(1).Height = clInfo.Height;
+            tMovieInfo(1).ImageType = clInfo.VideoFormat;
+        else
+            tMovieInfo = aviinfo(sFileName);
+        end
+        g_tWT.MovieInfo = tMovieInfo;
     else
-        tMovieInfo = aviinfo(sFileName);
+        wt_error(sprintf('Cannot read %s', wt_check_path(sFileName)));
     end
-    g_tWT.MovieInfo = tMovieInfo;
-else
-    wt_error(sprintf('Cannot read %s', wt_check_path(sFileName)));
 end
 
 % Default tracking parameters
@@ -188,10 +190,12 @@ catch
 end
 
 % Re-insert parameters from file info structure
-g_tWT.MovieInfo.FramesPerSecond = tMovieInfo.FramesPerSecond;
-g_tWT.MovieInfo.NumFrames = tMovieInfo.NumFrames;
-g_tWT.MovieInfo.Width = tMovieInfo.Width;
-g_tWT.MovieInfo.Height = tMovieInfo.Height;
+if ~strcmp(sFileName(end-3:end), '.mat')
+    g_tWT.MovieInfo.FramesPerSecond = tMovieInfo.FramesPerSecond;
+    g_tWT.MovieInfo.NumFrames = tMovieInfo.NumFrames;
+    g_tWT.MovieInfo.Width = tMovieInfo.Width;
+    g_tWT.MovieInfo.Height = tMovieInfo.Height;
+end
 
 if ~isfield(g_tWT.MovieInfo, 'CalBarLength'), g_tWT.MovieInfo.CalBarLength = []; end
 if ~isfield(g_tWT.MovieInfo, 'CalibCoords'), g_tWT.MovieInfo.CalibCoords = [0 0;0 0];    end

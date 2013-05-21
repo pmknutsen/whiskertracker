@@ -1,9 +1,15 @@
-function nNewFrame = wt_track_manual( varargin ) % Whisker ID
-% WT_TRACK_MANUAL
+function nNewFrame = wt_track_manual(varargin)
+% wt_track_manual(I)
+%   Track whisker manually where I is the index of the whisker to track.
+%
 
 global g_tWT
 
-%global nChWhisker % contains index of chosen whiskers
+% Check that file is loaded and that file is found on disk
+if ~exist(g_tWT.MovieInfo.Filename, 'file')
+    wt_set_status('Warning: Cannot locate movie file.')
+    return;
+end
 
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
 
