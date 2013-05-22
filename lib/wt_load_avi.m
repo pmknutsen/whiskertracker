@@ -67,7 +67,7 @@ try
         p_bDidAviReadCheck = 1;
     end
     
-    if (((bNewVidReader && length(vFrames) > 50) && ~ispc) || ~exist('aviread')) || p_bForceNewReader
+    if (((bNewVidReader && length(vFrames) > 10) && ~ispc) || ~exist('aviread')) || p_bForceNewReader
         tMov = eval([sVidReader '(sFile)']);
         nNumberOfFrames = tMov.NumberOfFrames;
         nHeight = tMov.Height;

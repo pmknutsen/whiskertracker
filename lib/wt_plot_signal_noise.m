@@ -1,5 +1,5 @@
 function bStop = wt_plot_signal_noise(vSR)
-% WT_PLOT_SIGNAL_NOISE
+% wt_plot_signal_noise
 % Plots the signal-to-noise ratio of the whisker against the background.
 % The ratio itself is computed in the find_next_whisker.dll. This function
 % just accepts the number(s) to plot. Adds a red, horizontal bar for
@@ -11,10 +11,7 @@ function bStop = wt_plot_signal_noise(vSR)
 
 global g_tWT
 
-persistent p_hSRWin
-persistent p_nAutoclear
-persistent p_nClock
-persistent p_vFPS
+persistent p_hSRWin p_nAutoclear p_nClock p_vFPS
 
 % Clear tracking speed variable
 if isempty(vSR), p_vFPS = []; end
@@ -25,9 +22,9 @@ if ~isempty(p_nClock)
     p_nClock = clock;
     p_vFPS = [p_vFPS length(vSR)/nElapsedTime]; % tracking speed, fps
     set(findobj('tag','fps'), 'label', sprintf('Tracking speed: %.1f fps', mean(p_vFPS)))
-else, p_nClock = clock; end
+else p_nClock = clock; end
 
-if isempty(p_nAutoclear), p_nAutoclear = 500;
+if isempty(p_nAutoclear) p_nAutoclear = 500;
 else
     if ~isempty(findobj('tag', 'AutoClearButton'))
         p_nAutoclear = get(findobj('tag', 'AutoClearButton'), 'UserData');
@@ -43,25 +40,25 @@ if isempty(p_hSRWin) | ~ishandle(p_hSRWin)
         'Position', [450 370 480 200], ...
         'CloseRequestFcn', 'wt_toggle_signal_noise;delete(gcbo)', ...
         'Color', 'k', ...
-        'Tag', 'SignalNoiseFig' )
+        'Tag', 'wt_sn_figure' )
     uimenu(gcf, 'Label', 'Clear', 'callback', 'wt_plot_signal_noise([])')
     uimenu(gcf, 'Label', sprintf('Set autoclear (%d frames)', p_nAutoclear), 'callback', @SetAutoClear, 'Tag', 'AutoClearButton')
     uimenu(gcf, 'Label', 'Tracking speed: 0 fps', 'Tag', 'fps')
 end
 
 % Axes
-hAxes = findobj('tag', 'sn_plot');
+hAxes = findobj('tag', 'wt_sn_axes');
 if isempty(hAxes)
     hAxes = subplot('Position', [.1 .15 .8 .7]);
     set(gca, 'FontSize', 7, 'color', 'k', ...
         'xcolor', 'w', 'ycolor', 'w', ...
         'ButtonDownFcn', @SetThreshold, ...
-        'tag', 'sn_plot' )
+        'tag', 'wt_sn_axes' )
     ylabel('S/N'); xlabel('Time (frames)')
 end
 
 % Plot
-hLines = get(hAxes(end), 'children'); % there are two line objects: S/N and THRESHOLD
+hLines = findobj(hAxes(end), 'type', 'line'); % there are two line objects: S/N and THRESHOLD
 if isempty(hLines)
     hLines(1) = line(1,1);
     hThreshLine = line(0,2);
@@ -70,18 +67,24 @@ if isempty(hLines)
 end
 
 % Return if the input is empty
+hSR = findobj('tag','SR');
 if isempty(vSR), vSR = 0;
-else, vSR = [get(findobj('tag','SR'),'ydata') vSR]; end
+else
+    hSR = hSR(1);
+    vSR = [get(hSR, 'ydata') vSR];
+end
 
 set(hAxes, 'ylim', [min(vSR)-2 max(vSR)+2])
 set(findobj('tag','SR'), 'ydata', vSR, 'xdata', 0:length(vSR)-1)
 vYdata = get(findobj('tag','THRESH'), 'ydata');
-set(findobj('tag','THRESH'), 'ydata', repmat(vYdata(1), 1, length(vSR)), 'xdata', 0:length(vSR)-1)
+if iscell(vYdata), vYdata = vYdata{1}; end
+set(findobj('tag', 'THRESH'), 'ydata', repmat(vYdata(1), 1, length(vSR)), 'xdata', 0:length(vSR)-1)
 
 hLines = get(hAxes(end), 'children'); % there are two line objects: S/N and THRESHOLD
 
 % Evaluate SR
 vThresh = get(findobj('tag','THRESH'), 'ydata');
+if iscell(vThresh) vThresh = vThresh{1}; end
 if (vSR(end) <= vThresh(end)) & vSR(end)~=0
     beep
     g_tWT.StopProc = 1;

@@ -118,6 +118,7 @@ g_tWT.MovieInfo.AngleDelta = 0;
 g_tWT.MovieInfo.HorJitter = [1 2 3];
 g_tWT.MovieInfo.HorJitterSlow = [1 1 1];
 g_tWT.MovieInfo.nHorAutoThresh = 100;
+g_tWT.MovieInfo.nTrackAccAdj = 0.1;
 g_tWT.MovieInfo.RadJitter = 1;
 g_tWT.MovieInfo.RefLine = [0 1; 0 2];
 g_tWT.MovieInfo.ViewMag = 1;

@@ -9,6 +9,7 @@ function nRMax = wt_get_curvature(mSplinePoints)
 %           arranged in frames along the 3rd dimension.
 %
 
+
 nRMax = [];
 for f = 1:size(mSplinePoints, 3)
     mSpl = mSplinePoints(:,:,f,1);

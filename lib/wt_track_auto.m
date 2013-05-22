@@ -2,12 +2,20 @@ function wt_track_auto(sSpeed)
 % wt_track_auto
 %
 %
+
 global g_tWT
 g_tWT.StopProc=0;
 
 sMethod = 'nearest'; % method of interpolation during image rotation
 
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
+
+% Start matlabpool if not open already
+if matlabpool('size') == 0
+    wt_set_status('Warning: Matlab worker pool not initialized. Starting pool now...')
+    matlabpool; % open default pool
+    wt_set_status(sprintf('Matlab worker pool started with %d workers.', matlabpool('size')))
+end
 
 % Disable 'play' buttons
 hBut = findobj('label','>'); set(hBut, 'enable','off')
@@ -133,6 +141,13 @@ for nStepRange = vTrackFrames
             else mCurrFrame = mImg; end
             [vScore(end+1), vScoreStd(end+1), nScoreN] = wt_find_next_whisker(w, nRealFrameNumber, nRealFrameNumber-1, mCurrFrame, sSpeed);
 
+            % Update Signal/Noise graph
+            if g_tWT.ShowSR
+                wt_plot_signal_noise(vScore./vScoreStd); drawnow
+                vScore = [];
+                vScoreStd = [];
+            end
+            
             % Enter manual mode if user stops execution
             if g_tWT.StopProc
                 wt_display_frame(nRealFrameNumber, mImgCroppedOnly);
@@ -147,14 +162,6 @@ for nStepRange = vTrackFrames
         if counter == g_tWT.MovieInfo.ScreenRefresh
             wt_display_frame(nRealFrameNumber, mImgCroppedOnly);
             counter = 1;
-            
-            % Update Signal/Noise graph
-            if g_tWT.ShowSR
-                wt_plot_signal_noise(vScore./vScoreStd); drawnow
-                vScore = [];
-                vScoreStd = [];
-            end
-            
         else counter = counter + 1; end
 
     end % end of current range loop (all loaded frames)

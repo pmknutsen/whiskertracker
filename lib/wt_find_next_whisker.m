@@ -17,8 +17,7 @@ if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
 
-warning('off', 'stats:nlinfit:IterationLimitExceeded')
-warning('off', 'stats:nlinfit:IllConditionedJacobian')
+warning('off', 'MATLAB:polyfit:PolyNotUnique')
 
 % Construct the velocity matrix
 %  - the velocity matrix attempts to extrapolate the new position of the
@@ -101,29 +100,57 @@ if nScore == 0
     end
     wt_set_status('Warning: Cannot discern whisker from background. Using coordinates of previous frame.')
 else
-    % Improve tracking accuracy by interpolating position of
-    % individual spline points to the exact location whisker center
+    % Improve tracking accuracy by interpolating position of individual points along the
+    % whisker spline to a better estimated location of whisker center.
+    % Note: This refinement takes a bit hit on performance.
     nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
-    for i = 1:size(mNewSpline, 1)
-        vXY = round(mNewSpline(i, :));
-        % Get profile of whisker shaft
-        vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
-        % skip if any part of the requested whisker cross-section falls outside
-        % of the frame
-        if ~(any(vX < 1) || any(vX > size(mImg, 1)))
-            vY = mImg(vX, vXY(1));
-            vY = (vY-min(vY))/max(vY-min(vY));
-            vXXi = linspace(min(vX), max(vX), 20);
-            vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
-            tOptions.MaxIter = 25;
-            tOptions.Display = 'off';
-            vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
-            vYYi = p_fQuadFun(vB, vXXi);
-            [nMin nMinIndx] = min(vYYi);
-            mNewSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+    if g_tWT.MovieInfo.nTrackAccAdj > 0
+        % 1.0  Fit every point along spline
+        % 0.0  Fit none of the points along the spline
+        % If a value above 0% is selected, the minimum number of points is 3
+        vXX = min(mNewSpline(:,1)):max(mNewSpline(:,1));
+        nLen = length(vXX);
+        nFit = round(nLen * g_tWT.MovieInfo.nTrackAccAdj); % number of points to fit
+        if nFit < 3 % minimum is 3 points
+            nFit = 3;
         end
-    end
-    g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurFrame,nChWhisker) = mNewSpline;% ./ g_tWT.MovieInfo.ResizeFactor;
+        vIndx = unique(round(linspace(1, nLen, nFit)));
+        [vXi, vYi] = wt_spline(mNewSpline(:,1), mNewSpline(:,2), vXX(vIndx));
+        mAdjustPoints = [vXi' vYi'];
+        
+        mFullSpline = [];
+        tOptions = statset('MaxIter', 25);
+        parfor i = 1:size(mAdjustPoints, 1) % note use of parfor
+            warning('off', 'stats:nlinfit:IterationLimitExceeded')
+            warning('off', 'stats:nlinfit:IllConditionedJacobian')
+            vXY = round(mAdjustPoints(i, :));
+            % Get profile of whisker shaft
+            vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
+            % skip if any part of the requested whisker cross-section falls outside
+            % of the frame
+            if ~(any(vX < 1) || any(vX > size(mImg, 1)))
+                vY = mImg(vX, vXY(1));
+                vY = (vY-min(vY))/max(vY-min(vY));
+                vXXi = linspace(min(vX), max(vX), 200);
+                vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
+                vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
+                vYYi = p_fQuadFun(vB, vXXi);
+                [nMin nMinIndx] = min(vYYi);
+                mFullSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+            end
+        end
+        
+        [vX, vY] = wt_spline(mFullSpline(:,1), mFullSpline(:,2), mNewSpline(:,1));
+        if size(mFullSpline, 1) > 3
+            [vP] = polyfit(mFullSpline(:,1), mFullSpline(:,2), 3);
+            vX = mNewSpline(:,1);
+            vY = vP(1).*vX.^3 + vP(2).*vX.^2 + vP(3).*vX + vP(4);
+            mNewSpline = [vX vY];
+        else
+            mNewSpline = mFullSpline;
+        end
+    end    
+    g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurFrame,nChWhisker) = mNewSpline;
 end
 
 % Add [0 0] rows removed earlier
