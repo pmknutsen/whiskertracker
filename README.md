@@ -10,19 +10,22 @@ Increase tracking speeds significantly by batch processing simultaneously with m
 * Cross-platform
 * Graphical user interface 
 * Automated and manual tracking 
-* Multiple tracking modes
+* Many tracking modes
 * Track movements of freely-moving or restrained rodents 
+* High sensitivity (sub-degree movements)
 * Data analysis tools
-* Many pre-processing options (rotation, ROI, background subtraction etc) 
+* Pre-processing options (transformations, ROI, background subtraction etc)
 * Extendible through custom scripts
-* Annotate movies with notes and outlines of objects
+* Annotations
 * Batch processing
-* Run batch jobs from multiple CPUs/cores
+* Multithreaded
 
 ##System Requirements
 Matlab 2012b or higher recommended (will also run on 6.1 or higher)
 
 Statistics Toolbox
+
+Parallel Processing Toolbox (recommended)
 
 Compiled binaries are included for Windows and Linux (32-bit Matlab)
 

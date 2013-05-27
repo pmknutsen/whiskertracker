@@ -5,6 +5,7 @@ function wt_toggle_signal_noise()
 %
 
 global g_tWT
+if isempty(g_tWT) return; end
 
 % Toggle verbose status
 g_tWT.ShowSR = ~g_tWT.ShowSR;

@@ -16,6 +16,18 @@ persistent p_fQuadFun
 if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
+nPoolSize = matlabpool('size');
+
+if exist('nlinfit') % statistics toolbox
+    sFitFun = 'nlinfit';
+    tOptions = statset('Display', 'off', 'MaxIter', 25);
+elseif exist('lsqcurvefit') % optimization toolbox
+    sFitFun = 'lsqcurvefit';
+    tOptions = optimset('Display', 'off', 'MaxIter', 25);
+else
+    sFitFun = 'none';
+    tOptions = struct([]);
+end
 
 warning('off', 'MATLAB:polyfit:PolyNotUnique')
 
@@ -117,27 +129,11 @@ else
         vIndx = unique(round(linspace(1, nLen, nFit)));
         [vXi, vYi] = wt_spline(mNewSpline(:,1), mNewSpline(:,2), vXX(vIndx));
         mAdjustPoints = [vXi' vYi'];
-        
-        mFullSpline = [];
-        tOptions = statset('MaxIter', 25);
-        parfor i = 1:size(mAdjustPoints, 1) % note use of parfor
-            warning('off', 'stats:nlinfit:IterationLimitExceeded')
-            warning('off', 'stats:nlinfit:IllConditionedJacobian')
-            vXY = round(mAdjustPoints(i, :));
-            % Get profile of whisker shaft
-            vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
-            % skip if any part of the requested whisker cross-section falls outside
-            % of the frame
-            if ~(any(vX < 1) || any(vX > size(mImg, 1)))
-                vY = mImg(vX, vXY(1));
-                vY = (vY-min(vY))/max(vY-min(vY));
-                vXXi = linspace(min(vX), max(vX), 200);
-                vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
-                vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
-                vYYi = p_fQuadFun(vB, vXXi);
-                [nMin nMinIndx] = min(vYYi);
-                mFullSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
-            end
+
+        if nPoolSize > 1 % run parallel version (parfor loop)
+            mFullSpline = OptimizeWhiskerPlacementPar(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
+        else % run non-parellel code (for loop)
+            mFullSpline = OptimizeWhiskerPlacement(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
         end
         
         [vX, vY] = wt_spline(mFullSpline(:,1), mFullSpline(:,2), mNewSpline(:,1));
@@ -193,4 +189,69 @@ if sum(g_tWT.MovieInfo.MidPointConstr(:,nChWhisker)) ~= 0
     end
 end
 
+return
+
+% Wrapper functions for optimizing whisker placement
+
+% Non-parallel processing version
+function mFullSpline = OptimizeWhiskerPlacement(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions)
+mFullSpline = [];
+warning('off', 'stats:nlinfit:IterationLimitExceeded')
+warning('off', 'stats:nlinfit:IllConditionedJacobian')
+for i = 1:size(mAdjustPoints, 1) % note use of parfor
+    vXY = round(mAdjustPoints(i, :));
+    % Get profile of whisker shaft
+    vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
+    % skip if any part of the requested whisker cross-section falls outside
+    % of the frame
+    if ~(any(vX < 1) || any(vX > size(mImg, 1)))
+        vY = mImg(vX, vXY(1));
+        vY = (vY-min(vY))/max(vY-min(vY));
+        vXXi = linspace(min(vX), max(vX), 200);
+        vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
+
+        switch sFitFun
+            case 'nlinfit'
+                vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
+            case 'lsqcurvefit'
+                vB = lsqcurvefit(p_fQuadFun, vInitParms, vX(:), vY, [], [], tOptions);
+        end
+        
+        vYYi = p_fQuadFun(vB, vXXi);
+        [nMin nMinIndx] = min(vYYi);
+        mFullSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+    end
+end
+return
+
+% Parallel processing version (parfor loop)
+function mFullSpline = OptimizeWhiskerPlacementPar(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions)
+mFullSpline = [];
+parfor i = 1:size(mAdjustPoints, 1) % note use of parfor
+    warning('off', 'stats:nlinfit:IterationLimitExceeded')
+    warning('off', 'stats:nlinfit:IllConditionedJacobian')
+    vXY = round(mAdjustPoints(i, :));
+    % Get profile of whisker shaft
+    vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
+    % skip if any part of the requested whisker cross-section falls outside
+    % of the frame
+    if ~(any(vX < 1) || any(vX > size(mImg, 1)))
+        vY = mImg(vX, vXY(1));
+        vY = (vY-min(vY))/max(vY-min(vY));
+        vXXi = linspace(min(vX), max(vX), 200);
+        vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
+
+        vB = [];
+        switch sFitFun
+            case 'nlinfit'
+                vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
+            case 'lsqcurvefit'
+                vB = lsqcurvefit(p_fQuadFun, vInitParms, vX(:), vY, [], [], tOptions);
+        end
+        
+        vYYi = p_fQuadFun(vB, vXXi);
+        [nMin nMinIndx] = min(vYYi);
+        mFullSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+    end
+end
 return

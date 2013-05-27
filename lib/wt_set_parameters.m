@@ -30,7 +30,10 @@ if nargin > 0
 end
 
 global g_hOptWin;
-if ~isempty(g_hOptWin), figure(g_hOptWin), return, end
+if ~isempty(g_hOptWin)
+    figure(g_hOptWin)
+    return
+end
 
 %%%% Start of field data %%%%
 
@@ -53,7 +56,7 @@ g_tOptFields.nHorJitterSlow  = {'Horizontal jitter [left mid right] SLOW >', num
 g_tOptFields.nHorJitter      = {'Horizontal jitter [left mid right] FAST >>', num2str(g_tWT.MovieInfo.HorJitter), '', 'g_tWT.MovieInfo.HorJitter'};
 g_tOptFields.nHorJitter      = {'Horizontal jitter [left mid right] FAST >>', num2str(g_tWT.MovieInfo.HorJitter), '', 'g_tWT.MovieInfo.HorJitter'};
 g_tOptFields.nHorAutoThresh  = {'Speed-select threshold (deg)', num2str(g_tWT.MovieInfo.nHorAutoThresh), '', 'g_tWT.MovieInfo.nHorAutoThresh'};
-g_tOptFields.nHorAutoThresh  = {'Tracking accuracy adjustment (%)', num2str(g_tWT.MovieInfo.nTrackAccAdj), '', 'g_tWT.MovieInfo.nTrackAccAdj'};
+g_tOptFields.nTrackAccAdj  = {'Tracking accuracy adjustment (%)', num2str(g_tWT.MovieInfo.nTrackAccAdj), '', 'g_tWT.MovieInfo.nTrackAccAdj'};
 
 g_tOptFields.nVertJitter     = {'Radial jitter of mid-point', num2str(g_tWT.MovieInfo.RadJitter), '', 'g_tWT.MovieInfo.RadJitter'};
 g_tOptFields.nWhiskerWidth   = {'Whisker filter-width', num2str(g_tWT.MovieInfo.WhiskerWidth), '', 'g_tWT.MovieInfo.WhiskerWidth'};
@@ -94,8 +97,9 @@ nFigWidth = 500;
 nTxtColRatio = 3/5; % portion of figure width occupied by the text column
 vFigPos = [(vScrnSize(3)/2)-(nFigWidth/2) (vScrnSize(4)/2)-(nFigHeight/2) nFigWidth nFigHeight];
 g_hOptWin = figure;
-
 set(g_hOptWin, 'NumberTitle', 'off', 'Position', vFigPos, 'MenuBar', 'none', 'DeleteFcn', 'clear global g_hOptWin')
+% Create an invisible axis (in case anything gets plotted into figure by mistake)
+hAx = axes('visible', 'off');
 
 nTxtColWidth = nFigWidth*nTxtColRatio; % width of descriptive text column
 nEdtColWidth = nFigWidth-nTxtColWidth; % width of input field column
@@ -214,11 +218,7 @@ return;
 
 %%%% UPDATE VARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function UpdateVars(nGuiElements)
-global g_tWT
-global g_cFieldNames;
-global g_tOptFields;
-
-g_tWT.FiltVec = [];
+global g_tWT g_cFieldNames g_tOptFields;
 
 % Update global variables with the new
 for f = 1:nGuiElements
@@ -228,7 +228,10 @@ for f = 1:nGuiElements
     end
 end
 
-return;
+% Update filter vector
+g_tWT.FiltVec = wt_create_filters(g_tWT.MovieInfo.WhiskerWidth, g_tWT.MovieInfo.FilterLen);
+
+return
 
 %%%% APPLY Params %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ApplyParams(varargin)
@@ -244,8 +247,10 @@ wt_calibration('recalculate');
 wt_update_window_title_status;
 wt_display_frame;
 
-figure(g_hOptWin);
-return;
+if exist('g_hOptWin')
+    figure(g_hOptWin);
+end
+return
 
 %%%% DONE Params %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function DoneParams(varargin)

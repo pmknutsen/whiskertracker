@@ -12,6 +12,7 @@ function wt_display_frame( varargin )
 %
 
 global g_tWT
+if isempty(g_tWT) return; end
 
 persistent nCurrentFrame % NOTE: is emptied when this file is changed!!!
 if isempty(nCurrentFrame), nCurrentFrame = 1; end % show 1st frame by default
