@@ -8,7 +8,9 @@ global g_tWT
 hFrameWin = findobj('Tag', 'WTMainWindow');
 set(hFrameWin, 'color', [.8 .8 .8])
 
-figure(hFrameWin); clf; g_tWT.Handles.hSlider = [];
+figure(hFrameWin);
+clf;
+g_tWT.Handles.hSlider = [];
 set(hFrameWin, 'NumberTitle', 'off', 'Name', ['WhiskerTracker'], ...
     'resizeFcn', ['wt_resize_slider'])
 
@@ -210,6 +212,7 @@ end
 
 % Help menu
 hHelp = uimenu(hFrameWin, 'Label', 'Help');
+uimenu(hFrameWin, 'Label','&Tip of the day', 'Parent', hHelp, 'Callback', ['wt_tip_of_the_day']);
 uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', ['wt_get_build_number']);
 uimenu(hFrameWin, 'Label','&Check for Updates', 'Parent', hHelp, 'Callback', ['wt_check_update']);
 uimenu(hFrameWin, 'Label','&License', 'Parent', hHelp, 'Callback', ['wt_show_license']);
