@@ -56,7 +56,7 @@ g_tOptFields.nHorJitterSlow  = {'Horizontal jitter [left mid right] SLOW >', num
 g_tOptFields.nHorJitter      = {'Horizontal jitter [left mid right] FAST >>', num2str(g_tWT.MovieInfo.HorJitter), '', 'g_tWT.MovieInfo.HorJitter'};
 g_tOptFields.nHorJitter      = {'Horizontal jitter [left mid right] FAST >>', num2str(g_tWT.MovieInfo.HorJitter), '', 'g_tWT.MovieInfo.HorJitter'};
 g_tOptFields.nHorAutoThresh  = {'Speed-select threshold (deg)', num2str(g_tWT.MovieInfo.nHorAutoThresh), '', 'g_tWT.MovieInfo.nHorAutoThresh'};
-g_tOptFields.nTrackAccAdj  = {'Tracking accuracy adjustment (%)', num2str(g_tWT.MovieInfo.nTrackAccAdj), '', 'g_tWT.MovieInfo.nTrackAccAdj'};
+g_tOptFields.nTrackAccAdj  = {'Accuracy adjustment (0 to 1)', num2str(g_tWT.MovieInfo.nTrackAccAdj), '', 'g_tWT.MovieInfo.nTrackAccAdj'};
 
 g_tOptFields.nVertJitter     = {'Radial jitter of mid-point', num2str(g_tWT.MovieInfo.RadJitter), '', 'g_tWT.MovieInfo.RadJitter'};
 g_tOptFields.nWhiskerWidth   = {'Whisker filter-width', num2str(g_tWT.MovieInfo.WhiskerWidth), '', 'g_tWT.MovieInfo.WhiskerWidth'};

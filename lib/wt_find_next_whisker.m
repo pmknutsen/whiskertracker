@@ -16,7 +16,11 @@ persistent p_fQuadFun
 if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
-nPoolSize = matlabpool('size');
+if g_tWT.ParallelMode && exist('matlabpool')
+    nPoolSize = matlabpool('size');
+else
+    nPoolSize = 0;
+end
 
 if exist('nlinfit') % statistics toolbox
     sFitFun = 'nlinfit';

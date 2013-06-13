@@ -28,12 +28,13 @@ disp('are welcome to redistribute it under certain conditions; see LICENSE for d
 
 disp(sprintf('\nPlease cite the following reference in any publication using this work:\nKnutsen, Derdikman & Ahissar (2005) Journal of Neurophysiology 93 (4) 2294–301.\n'))
 
-
 % Set paths
 sWT_dir = which('wt');
 sWT_dir = sWT_dir(1:findstr(sWT_dir, 'wt.m')-1);
 path(path, sWT_dir)
 path(path, sprintf('%sbin/', sWT_dir))
+path(path, sprintf('%sbin/linux/', sWT_dir))
+path(path, sprintf('%sbin/windows/', sWT_dir))
 path(path, sprintf('%slib/', sWT_dir))
 path(path, sprintf('%sicons/', sWT_dir))
 path(path, sprintf('%sscripts/', sWT_dir))
@@ -75,6 +76,7 @@ g_tWT.Movies = [];
 g_tWT.MovieInfo = struct('Roi', []);
 g_tWT.BatchMode = 0;
 g_tWT.Colors = distinguishable_colors(100);
+g_tWT.ParallelMode = 1;
 
 wt_prep_gui
 

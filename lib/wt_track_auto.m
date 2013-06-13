@@ -11,10 +11,17 @@ sMethod = 'nearest'; % method of interpolation during image rotation
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
 
 % Start matlabpool if not open already
-if matlabpool('size') == 0
-    wt_set_status('Warning: Matlab worker pool not initialized. Starting pool now...')
-    matlabpool; % open default pool
-    wt_set_status(sprintf('Matlab worker pool started with %d workers.', matlabpool('size')))
+if g_tWT.ParallelMode
+    try
+        if matlabpool('size') == 0
+            wt_set_status('Warning: Matlab worker pool not initialized. Starting pool now...')
+            matlabpool; % open default pool
+            wt_set_status(sprintf('Matlab worker pool started with %d workers.', matlabpool('size')))
+        end
+    catch
+            wt_set_status('Error: Failed starting Matlab worker pool.')
+            wt_toggle_parallel();
+    end
 end
 
 % Disable 'play' buttons

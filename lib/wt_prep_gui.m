@@ -11,7 +11,7 @@ set(hFrameWin, 'color', [.8 .8 .8])
 figure(hFrameWin);
 clf;
 g_tWT.Handles.hSlider = [];
-set(hFrameWin, 'NumberTitle', 'off', 'Name', ['WhiskerTracker'], ...
+set(hFrameWin, 'NumberTitle', 'off', 'Name', 'Whisker Tracker', ...
     'resizeFcn', ['wt_resize_slider'])
 
 g_tWT.FrameAx = axes;
@@ -37,17 +37,21 @@ uitoggletool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_Zo
 [mCData, mCM] = imread([sPath 'tools_table.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_EditParameters', 'TooltipString', 'Edit Parameters', 'ClickedCallback', ['wt_set_parameters']);
 
-mCData = im2double(imread([sPath 'tool_rotate_3d.png'])); mCData(mCData == 0) = NaN;
-mCData_orig = mCData;
-for i = 1:3, mCData(:,:,i) = fliplr(mCData(:,:,i)); end
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Rotate Clockwise', 'ClickedCallback', ['wt_rotate_frame(1); wt_batch_redo(''wt_rotate_frame(1)'')'], 'separator', 'on');
-uipushtool('Parent', hToolbar, 'cdata', mCData_orig, 'Tag', 'Spiky_WaitbarAction_RotateAntiClockwise', 'TooltipString', 'Rotate Anti-Clockwise', 'ClickedCallback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')']);
-
 mCData = im2double(imread([sPath 'tool_plottools_show.png'])); mCData(mCData == 0) = NaN;
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Auto-resize window', 'ClickedCallback', ['wt_autosize_window']);
 
+[mCData, mCM] = imread([sPath 'tool_rotate_counterclockwise.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateAntiClockwise', 'TooltipString', 'Rotate Counter-Clockwise', 'ClickedCallback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')'], 'separator', 'on');
+[mCData, mCM] = imread([sPath 'tool_rotate_clockwise.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Rotate Clockwise', 'ClickedCallback', ['wt_rotate_frame(1); wt_batch_redo(''wt_rotate_frame(1)'')']);
+[mCData, mCM] = imread([sPath 'tool_flip_horizontal.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Flip Horizontally', 'ClickedCallback', ['wt_flip_frame(''leftright''); wt_batch_redo(''wt_flip_frame(''''leftright'''')'')']);
+[mCData, mCM] = imread([sPath 'tool_flip_vertical.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Flip Vertically', 'ClickedCallback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')']);
+
+
 [mCData, mCM] = imread([sPath 'right.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking SLOW
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''slow'')']);
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''slow'')'], 'separator', 'on');
 
 [mCData, mCM] = imread([sPath 'right_double.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking FAST
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track FAST', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''fast'')']);
@@ -68,7 +72,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Load Data...', 'Parent', hFile, 'Callback', ['wt_load_data(''deffile'')'], 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Save', 'Parent', hFile, 'Callback', ['wt_save_data'], 'accelerator', 'S');
     uimenu(hFrameWin, 'Label','Save As...', 'Parent', hFile, 'Callback', ['wt_save_data(''defpath'')']);
-    uimenu(hFrameWin, 'Label','Reset Current File (B)', 'Parent', hFile, 'Callback', ['wt_reset_all; wt_batch_redo(''wt_reset_all'')']);
+    uimenu(hFrameWin, 'Label','Reset Current File', 'Parent', hFile, 'Callback', ['wt_reset_all; wt_batch_redo(''wt_reset_all'')'], 'checked', 'on');
 
     hMovies = uimenu(hFrameWin, 'Label', 'Movies', 'Parent', hFile, 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Previous...', 'Parent', hFile, 'Callback', ['wt_load_movie(-1)']);
@@ -90,22 +94,22 @@ if ~isempty(g_tWT.Movies)
     % Whiskers
     hWhiskers = uimenu(hFrameWin, 'Label', 'Whiskers');
     uimenu(hFrameWin, 'Label','New...', 'Parent', hWhiskers, 'Callback', ['wt_mark_whisker'], 'accelerator', 'W');
-    uimenu(hFrameWin, 'Label','Paste (B)', 'Parent', hWhiskers, 'Callback', ['wt_copy_paste_whisker(''paste'', NaN); wt_batch_redo(''wt_copy_paste_whisker(''''paste'''', NaN)'');'], 'accelerator', 'V');
+    uimenu(hFrameWin, 'Label','Paste', 'Parent', hWhiskers, 'Callback', ['wt_copy_paste_whisker(''paste'', NaN); wt_batch_redo(''wt_copy_paste_whisker(''''paste'''', NaN)'');'], 'accelerator', 'V', 'checked', 'on');
     uimenu(hFrameWin, 'Label','Delete...', 'Parent', hWhiskers, 'Callback', ['wt_clear_selected_whisker']);
-    uimenu(hFrameWin, 'Label','Delete All (B)', 'Parent', hWhiskers, 'Callback', ['wt_clear_whisker(''all''); wt_batch_redo(''wt_clear_whisker(''''all'''')'')']);
+    uimenu(hFrameWin, 'Label','Delete All', 'Parent', hWhiskers, 'Callback', ['wt_clear_whisker(''all''); wt_batch_redo(''wt_clear_whisker(''''all'''')'')'], 'checked', 'on');
 
-    uimenu(hFrameWin, 'Label','Track - Slow (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Track - Fast (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');']);
-    uimenu(hFrameWin, 'Label','Auto Select Speed (B)', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');']);
+    uimenu(hFrameWin, 'Label','Track - Slow', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on', 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Track - Fast', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Auto Select Speed', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', ['wt_set_tracking_range()']);
     
     % Whisker labels
     hLabels = uimenu(hFrameWin, 'Label', 'Whisker Labels', 'Parent', hWhiskers, 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Track Labels (B)', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')']);
+    uimenu(hFrameWin, 'Label','Track Labels', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Label Filter...', 'Parent', hLabels, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
     uimenu(hFrameWin, 'Label','Mark Whisker and Label...', 'Parent', hLabels, 'Callback', ['wt_mark_whisker_and_label;']);
-    uimenu(hFrameWin, 'Label','Clear Labels (B)', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')']);
-    uimenu(hFrameWin, 'Label','Extend Whiskers (B)', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])']);
+    uimenu(hFrameWin, 'Label','Clear Labels', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Extend Whiskers', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Label Names', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity')
 
     uimenu(hFrameWin, 'Label','Set Last Frame...', 'Parent', hWhiskers, 'Callback', ['wt_set_last_frame'], 'Separator', 'on');
@@ -129,12 +133,12 @@ if ~isempty(g_tWT.Movies)
     hTriggers = uimenu(hFrameWin, 'Label', 'Triggers', 'Parent', hImage);
     uimenu(hFrameWin, 'Label','Show Overlays', 'Parent', hTriggers, 'Callback', 'wt_toggle_trigger_overlays');
     uimenu(hFrameWin, 'Label','Overlay Location', 'Parent', hTriggers, 'Callback', 'wt_set_overlay_location');
-    uimenu(hFrameWin, 'Label','Track Trigger... (B)', 'Parent', hTriggers, 'Callback', ['wt_track_stimulus; wt_batch_redo(''wt_track_stimulus'')']);
+    uimenu(hFrameWin, 'Label','Track Trigger...', 'Parent', hTriggers, 'Callback', ['wt_track_stimulus; wt_batch_redo(''wt_track_stimulus'')'], 'checked', 'on');
     
-    uimenu(hFrameWin, 'Label','Rotate Clockwise (B)', 'Parent', hImage, 'Callback', ['wt_rotate_frame(1); wt_batch_redo(''wt_rotate_frame(1)'')'], 'Separator', 'on', 'accelerator', 'c');
-    uimenu(hFrameWin, 'Label','Rotate Anti-Clockwise (B)', 'Parent', hImage, 'Callback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')'], 'accelerator', 'a');
-    uimenu(hFrameWin, 'Label','Flip Vertical (B)', 'Parent', hImage, 'Callback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')']);
-    uimenu(hFrameWin, 'Label','Flip Horizontal (B)', 'Parent', hImage, 'Callback', ['wt_flip_frame(''leftright''); wt_batch_redo(''wt_flip_frame(''''leftright'''')'')']);
+    uimenu(hFrameWin, 'Label','Rotate 90° Clockwise', 'Parent', hImage, 'Callback', ['wt_rotate_frame(1); wt_batch_redo(''wt_rotate_frame(1)'')'], 'Separator', 'on', 'accelerator', 'c', 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Rotate 90° Counter-Clockwise', 'Parent', hImage, 'Callback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')'], 'accelerator', 'a', 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Flip Vertically', 'Parent', hImage, 'Callback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Flip Horizontally', 'Parent', hImage, 'Callback', ['wt_flip_frame(''leftright''); wt_batch_redo(''wt_flip_frame(''''leftright'''')'')'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Refresh', 'Parent', hImage, 'Callback', ['wt_prep_gui; wt_display_frame'], 'Separator', 'on', 'accelerator', 'R');
     uimenu(hFrameWin, 'Label','Hide', 'Parent', hImage, 'Callback', ['wt_toggle_imageshow'], 'accelerator', 'H');
     uimenu(hFrameWin, 'Label','Go To Frame...', 'Parent', hImage, 'Callback', @GoToFrame, 'accelerator', 'G');
@@ -144,13 +148,13 @@ if ~isempty(g_tWT.Movies)
 
     uimenu(hFrameWin, 'Label','Plot...', 'Parent', hImage, 'Callback', ['wt_graphs']);
     hCompute = uimenu(hFrameWin, 'Label', 'Compute', 'Parent', hImage);
-    uimenu(hFrameWin, 'Label', 'All Parameters (B)', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''all'', 0); wt_batch_redo(''wt_compute_kinematics(''''all'''',0)'');']);
-    uimenu(hFrameWin, 'Label', 'Angle (B)', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''angle'', 0); wt_batch_redo(''wt_compute_kinematics(''''angle'''',0)'');'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label', 'Curvature (B)', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''curvature'', 0); wt_batch_redo(''wt_compute_kinematics(''''curvature'''',0)'');']);
-    uimenu(hFrameWin, 'Label', 'Object Distance (B)', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''objectdist'', 0); wt_batch_redo(''wt_compute_kinematics(''''objectdist'''',0)'');']);
+    uimenu(hFrameWin, 'Label', 'All Parameters', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''all'', 0); wt_batch_redo(''wt_compute_kinematics(''''all'''',0)'');'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label', 'Angle', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''angle'', 0); wt_batch_redo(''wt_compute_kinematics(''''angle'''',0)'');'], 'Separator', 'on', 'checked', 'on');
+    uimenu(hFrameWin, 'Label', 'Curvature', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''curvature'', 0); wt_batch_redo(''wt_compute_kinematics(''''curvature'''',0)'');'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label', 'Object Distance', 'Parent', hCompute, 'Callback', ['wt_compute_kinematics(''objectdist'', 0); wt_batch_redo(''wt_compute_kinematics(''''objectdist'''',0)'');'], 'checked', 'on');
     
     uimenu(hFrameWin, 'Label','Set Reference Angle...', 'Parent', hImage, 'Callback', 'wt_set_reference_line', 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Use Default Reference Angle (B)', 'Parent', hImage, 'Callback', 'wt_set_default_reference_line; wt_batch_redo(''wt_set_default_reference_line'')');
+    uimenu(hFrameWin, 'Label','Use Default Reference Angle', 'Parent', hImage, 'Callback', 'wt_set_default_reference_line; wt_batch_redo(''wt_set_default_reference_line'')', 'checked', 'on');
 
     hCalibrate = uimenu(hFrameWin, 'Label','Calibrate...', 'Parent', hImage, 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Calibrate...', 'Parent', hCalibrate, 'Callback', ['wt_calibration(''calibrate'')']);
@@ -159,8 +163,8 @@ if ~isempty(g_tWT.Movies)
     
     hOutlines = uimenu(hFrameWin, 'Label', 'Outlines', 'Parent', hImage);
     uimenu(hFrameWin, 'Label','Create Outline', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''add'')']);
-    uimenu(hFrameWin, 'Label','Paste Outline (B)', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''paste'', NaN); wt_batch_redo(''wt_create_outline(''''paste'''', NaN)'')']);
-    uimenu(hFrameWin, 'Label','Delete All Outlines (B)', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''deleteall'', NaN); wt_batch_redo(''wt_create_outline(''''deleteall'''', NaN)'')']);
+    uimenu(hFrameWin, 'Label','Paste Outline', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''paste'', NaN); wt_batch_redo(''wt_create_outline(''''paste'''', NaN)'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Delete All Outlines', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''deleteall'', NaN); wt_batch_redo(''wt_create_outline(''''deleteall'''', NaN)'')'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Hide Outlines', 'Parent', hOutlines, 'Callback', ['wt_create_outline(''hide'')']);
 
 end
@@ -169,7 +173,7 @@ end
 hOptions = uimenu(hFrameWin, 'Label', 'Options');
 
 hScripts = uimenu(hFrameWin, 'Label', 'Scripts', 'Parent', hOptions);
-uimenu(hFrameWin, 'Label', 'Run Script... (B)', 'Parent', hScripts, 'Callback', ['wt_run_script']);
+uimenu(hFrameWin, 'Label', 'Run Script...', 'Parent', hScripts, 'Callback', ['wt_run_script'], 'checked', 'on');
 uimenu(hFrameWin, 'Label', 'Run Batch Script...', 'Parent', hScripts, 'Callback', ['wt_run_script(''batch'')']);
 uimenu(hFrameWin, 'Label', 'Get Script Help...', 'Parent', hScripts, 'Callback', ['wt_run_script_help']);
 
@@ -196,18 +200,18 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label', 'Batch Redo', 'Parent', hOptions, 'Callback', ['wt_batch_redo(''redo'')'], 'accelerator', 'B');
 
     uimenu(hFrameWin, 'Label', 'Parameters...', 'Parent', hOptions, 'Callback', ['wt_set_parameters'], 'accelerator', 'P');
-    uimenu(hFrameWin, 'Label', 'User Variables (B)...', 'Parent', hOptions, 'Callback', ['wt_user_variables;wt_batch_redo(''wt_user_variables(''''copyfrommem'''')'')'], 'accelerator', 'U');
+    uimenu(hFrameWin, 'Label', 'User Variables...', 'Parent', hOptions, 'Callback', ['wt_user_variables;wt_batch_redo(''wt_user_variables(''''copyfrommem'''')'')'], 'accelerator', 'U', 'checked', 'on');
 
     uimenu(hFrameWin, 'Label','Signal-to-Noise', 'Parent', hOptions, 'Callback', ['wt_toggle_signal_noise'], 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Notes...', 'Parent', hOptions, 'Callback', ['wt_edit_notes'], 'accelerator', 'e');
     uimenu(hFrameWin, 'Label','Debug Window', 'Parent', hOptions, 'Callback', ['wt_toggle_verbose']);
+    uimenu(hFrameWin, 'Label','Use Parallel Processing', 'Parent', hOptions, 'Callback', ['wt_toggle_parallel'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Compress Datafiles', 'Parent', hOptions, 'Callback', ['wt_toggle_datacompress'], 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Uncompress Movie', 'Parent', hOptions, 'Callback', ['wt_uncompress_movie']);
     uimenu(hFrameWin, 'Label','Play Movie', 'Parent', hOptions, 'Callback', ['wt_play_movie'], 'Separator', 'on', 'accelerator', 'M');
-    uimenu(hFrameWin, 'Label','Movie Preview (B)', 'Parent', hOptions, 'Callback', ['wt_play_movie(''preview''); wt_batch_redo(''wt_play_movie(''''preview'''')'');']);
+    uimenu(hFrameWin, 'Label','Movie Preview', 'Parent', hOptions, 'Callback', ['wt_play_movie(''preview''); wt_batch_redo(''wt_play_movie(''''preview'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Save Movie', 'Parent', hOptions, 'Callback', ['wt_play_movie(''save'')']);
     uimenu(hFrameWin, 'Label','Dump Screen...', 'Parent', hOptions, 'Callback', ['wt_dump_screen'], 'Separator', 'on');
-
 end
 
 % Help menu
