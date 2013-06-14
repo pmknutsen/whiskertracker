@@ -22,12 +22,13 @@ else
     nPoolSize = 0;
 end
 
+% Setting fitting parameters (somewhat optimized for speed)
 if exist('nlinfit') % statistics toolbox
     sFitFun = 'nlinfit';
-    tOptions = statset('Display', 'off', 'MaxIter', 25);
+    tOptions = statset('Display', 'off', 'MaxIter', 10, 'TolFun', 1e-2, 'TolX', 1e-4);
 elseif exist('lsqcurvefit') % optimization toolbox
     sFitFun = 'lsqcurvefit';
-    tOptions = optimset('Display', 'off', 'MaxIter', 25);
+    tOptions = optimset('Display', 'off', 'MaxIter', 10, 'TolFun', 1e-3, 'TolX', 1e-4);
 else
     sFitFun = 'none';
     tOptions = struct([]);
@@ -213,7 +214,7 @@ for i = 1:size(mAdjustPoints, 1) % note use of parfor
         vY = (vY-min(vY))/max(vY-min(vY));
         vXXi = linspace(min(vX), max(vX), 200);
         vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
-
+        
         switch sFitFun
             case 'nlinfit'
                 vB = nlinfit(vX(:), vY, p_fQuadFun, vInitParms, tOptions);
@@ -226,6 +227,7 @@ for i = 1:size(mAdjustPoints, 1) % note use of parfor
         mFullSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
     end
 end
+
 return
 
 % Parallel processing version (parfor loop)
