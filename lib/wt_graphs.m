@@ -102,15 +102,16 @@ else
     % keep structure that contains 1) type of plot, 2) mid-line, 3) height
     % (2 and 3 is for normalization of the trace and the calibration bars)
     % We keep track of plot-type by name and number (for sorting)
-    tPlots = struct('order',{{'Triggers', 'Object distance', 'Base Translation', 'Curvature', 'Angle', 'Velocity', 'Acceleration'}});
+    tPlots = struct('order',{{'Triggers', 'Object distance', 'Base Translation', 'Curvature', 'Change in Curvature', 'Angle', 'Velocity', 'Acceleration'}});
     tPlots.proportion = [ ...
             .1 ...  % triggers
             .15 ...  % positon from object
-            .15 ...  % Base Translation
+            .1 ...  % Base Translation
             .15 ...  % curvature
+            .1 ...  % change in curvature
             .15 ...  % angle
             .15 ...  % velocity
-            .15 ...  % acceleration
+            .1 ...  % acceleration
         ];
     tPlots.midline = zeros(1, size(tPlots.order, 2));
     tPlots.height  = zeros(1, size(tPlots.order, 2));
@@ -120,6 +121,7 @@ else
             2, ...  % Object distance, mm or pix
             1, ...  % Base Translation, mm or pix
             NaN, ...  % Curvature, mm or pix
+            NaN, ...  % Change in curvature, mm or pix
             5, ...  % Degrees angle
             500, ...   %  Velocity, deg/sec
             250 ...   % Acceleration, deg/sec^2
@@ -401,6 +403,52 @@ else
             end
         end
 
+        % Plot change in curvature
+        nCurvatureIndx = find(strcmp(tPlots.order, 'Change in Curvature'));
+        if tPlots.height(nCurvatureIndx) ~= 0
+
+            % Find missing frames
+            vSplFrames = find(sum(sum(g_tWT.MovieInfo.SplinePoints(:,:,:,p_vPlotWhichWhiskers(w)))) > 0); % tracked frames
+            try
+                vCurvFrames = find(g_tWT.MovieInfo.Curvature(:,p_vPlotWhichWhiskers(w)) ~= 0 ); % frames with computed curv
+                vMissingFrames = setdiff(vSplFrames, vCurvFrames); % tracked frames without curv
+            catch vMissingFrames = vSplFrames; end
+
+            if ~isempty(vMissingFrames)
+                mSplinePoints = g_tWT.MovieInfo.SplinePoints(:, :, vMissingFrames, p_vPlotWhichWhiskers(w));
+                if g_tWT.MovieInfo.AngleDelta == 0
+                    g_tWT.MovieInfo.Curvature(vMissingFrames, p_vPlotWhichWhiskers(w)) = wt_get_curv_at_base(mSplinePoints);
+                else
+                    g_tWT.MovieInfo.Curvature(vMissingFrames, p_vPlotWhichWhiskers(w)) = wt_get_curvature(mSplinePoints);
+                end
+                vIsZeroIndx = g_tWT.MovieInfo.Curvature(:, p_vPlotWhichWhiskers(w)) == 0;
+                g_tWT.MovieInfo.Curvature(vIsZeroIndx, p_vPlotWhichWhiskers(w)) = NaN;
+            end
+
+            vCurvatureDiff = diff(g_tWT.MovieInfo.Curvature(:, p_vPlotWhichWhiskers(w)));
+            sUnit = 'pix';
+            if isfield(g_tWT.MovieInfo, 'PixelsPerMM')
+                if ~isempty(g_tWT.MovieInfo.PixelsPerMM)
+                    vCurvatureDiff = vCurvatureDiff .* g_tWT.MovieInfo.PixelsPerMM;
+                    sUnit = 'mm';
+                end
+            end
+            vCurvatureDiffFilt = FilterSeries(vCurvatureDiff);
+            [vCurvatureDiff, nNormFact] = NormalizeToHeight(vCurvatureDiffFilt, tPlots.midline(nCurvatureIndx), tPlots.height(nCurvatureIndx));
+            PlotTrace(vCurvatureDiff, vCurvatureDiffFilt, hLeftPanel, 'curvature', tPlots.midline(nCurvatureIndx), 'Curv', nFS)
+            DrawCalibrationBar(nNormFact, tPlots.calib(nCurvatureIndx), vCurvatureDiff, sprintf('%.2f s', tPlots.calib(nCurvatureIndx), sUnit), nFS)
+            PlotMaxDwellTime(vCurvatureDiffFilt, vCurvatureDiff, nNormFact, sprintf('%s', sUnit), nFS);
+            %  - plot average curvature
+            if ~isempty(find(strcmp(p_cActivePlots, 'Avg cycle (trig A)')))
+                nLen = PlotTraceWithErrorBars(vCurvatureDiff, vCurvatureDiffFilt, g_tWT.MovieInfo.StimulusA, hRightPanel, 'curvature-average-stimA');
+                nRightPanelLength = max([nRightPanelLength nLen]);
+            end
+            if ~isempty(find(strcmp(p_cActivePlots, 'Avg cycle (trig B)')))
+                nLen = PlotTraceWithErrorBars(vCurvatureDiff, vCurvatureDiffFilt, g_tWT.MovieInfo.StimulusB, hRightPanel, 'curvature-average-stimB');
+                nRightPanelLength = max([nRightPanelLength nLen]);
+            end
+        end
+
         % Plot stimulus
         nTrigIndx = find(strcmp(tPlots.order, 'Triggers'));
         if tPlots.height(nTrigIndx) ~= 0
@@ -464,9 +512,9 @@ return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function PrintHeader( sHeader , hWindow , nYpos )
-uicontrol(hWindow, 'Style', 'frame', 'Position', [1 nYpos 150 20], ...
+uicontrol(hWindow, 'Style', 'frame', 'Position', [1 nYpos 160 20], ...
     'BackgroundColor', [.4 .4 .4] );
-uicontrol(hWindow, 'Style', 'text', 'Position', [5 nYpos+2 145 14], ...
+uicontrol(hWindow, 'Style', 'text', 'Position', [5 nYpos+2 160-5 14], ...
     'String', sHeader, ...
     'HorizontalAlignment', 'center', ...
     'foregroundcolor', [.9 .9 .9], ...
@@ -612,7 +660,7 @@ return
 function CreateMenu
 global g_tWT
 
-cOptions = {'Angle', 'Velocity', 'Acceleration', 'Curvature', 'Base Translation', 'Object distance', 'Triggers', 'Avg cycle (trig A)', 'Avg cycle (trig B)'};
+cOptions = {'Angle', 'Velocity', 'Acceleration', 'Curvature', 'Change in Curvature', 'Base Translation', 'Object distance', 'Triggers', 'Avg cycle (trig A)', 'Avg cycle (trig B)'};
 % Set text parameters
 nFontSize = 8;
 nLinSep = 10;
@@ -623,7 +671,7 @@ end
 % Open figure window
 vScrnSize = get(0, 'ScreenSize');
 nFigHeight = nGuiElements * (nFontSize*2 + nLinSep) + 60;
-nFigWidth = 150;
+nFigWidth = 160;
 vFigPos = [5 vScrnSize(4)-(nFigHeight+21) nFigWidth nFigHeight];
 hCurrWin = figure;
 set(hCurrWin, 'NumberTitle', 'off', ...
@@ -639,7 +687,7 @@ nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
 PrintHeader('Select plots', hCurrWin, nCurrLine)
 for o = 1:size(cOptions, 2)
     nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
-    uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine 150 20], ...
+    uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine nFigWidth 20], ...
         'Callback', 'wt_graphs(get(gcbo,''string''), get(gcbo,''value''))', ...
         'String', char(cOptions(o)), ...
         'HorizontalAlignment', 'left', ...
@@ -664,7 +712,7 @@ for w = 1:size(g_tWT.MovieInfo.SplinePoints, 4)
     nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
     nWind = rem(w, size(g_tWT.Colors,1));
     if nWind == 0, nWind = size(g_tWT.Colors,1); end
-    hBox = uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine 125 20], ...
+    hBox = uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine nFigWidth-25 20], ...
         'Callback', 'wt_graphs(get(gcbo, ''Tag''), get(gcbo, ''Value''))', ... % 0=OFF, 1=ON
         'HorizontalAlignment', 'right', ...
         'String', wt_whisker_id(w), ...
@@ -676,7 +724,7 @@ end
 % Checkbox for plotting head-movements
 if ~isempty(g_tWT.MovieInfo.EyeNoseAxLen)
     nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
-    uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine 125 20], ...
+    uicontrol(hCurrWin, 'Style', 'checkbox', 'Position', [10 nCurrLine nFigWidth-25 20], ...
         'Callback', 'wt_graphs(get(gcbo, ''Tag''), get(gcbo, ''Value''))', ... % 0=OFF, 1=ON
         'String', 'Head', ...
         'FontWeight', 'bold', ...
@@ -686,7 +734,7 @@ if ~isempty(g_tWT.MovieInfo.EyeNoseAxLen)
 end
 % Refresh pushbutton
 nCurrLine = nCurrLine - (nFontSize*2 + nLinSep);
-uicontrol(hCurrWin, 'Style', 'pushbutton', 'Position', [10 nCurrLine 125 20], ...
+uicontrol(hCurrWin, 'Style', 'pushbutton', 'Position', [10 nCurrLine nFigWidth-25 20], ...
     'Callback', 'wt_graphs(''refresh''); wt_graphs(get(gcbo, ''Tag''), get(gcbo, ''Value''))', ... % 0=OFF, 1=ON
     'String', 'Refresh', ...
     'FontWeight', 'bold' );
