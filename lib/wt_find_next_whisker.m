@@ -13,6 +13,7 @@ function [nScore, nScoreStd, nScoreN] = wt_find_next_whisker(nChWhisker, nCurFra
 global g_tWT
 persistent p_fQuadFun
 
+% Initialize fitting function
 if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
@@ -64,6 +65,7 @@ else
 end
 
 % Get whisker spline of previous frame
+nPrevFrame = max([nPrevFrame 1]);
 mCurrSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nPrevFrame, nChWhisker));
 vRemRows = find(~sum(mCurrSpline'));
 mCurrSpline(vRemRows,:) = []; % Remove [0 0] rows
@@ -100,10 +102,18 @@ if size(mCurrSpline, 1) == 4
 end
 
 % Cell MEX routine
-try
-    [mNewSpline, nScore, nScoreStd, nScoreN] = find_next_whisker(mCurrSpline, mEnumRange, mImg, g_tWT.FiltVec, mVelMat );
-catch
-    wt_error(lasterr, 'error')
+if g_tWT.RepositionOnly
+    % If we are only doing repositioning, grab already tracked location
+    mNewSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nCurFrame, nChWhisker));
+    nScore = 2;
+    nScoreStd = 0;
+    nScoreN = 0;
+else
+    try
+        [mNewSpline, nScore, nScoreStd, nScoreN] = find_next_whisker(mCurrSpline, mEnumRange, mImg, g_tWT.FiltVec, mVelMat );
+    catch
+        wt_error(lasterr, 'error')
+    end
 end
 
 % TEMPORARY PATCH
@@ -120,37 +130,39 @@ else
     % Improve tracking accuracy by interpolating position of individual points along the
     % whisker spline to a better estimated location of whisker center.
     % Note: This refinement takes a bit hit on performance.
-    nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
-    if g_tWT.MovieInfo.nTrackAccAdj > 0
-        % 1.0  Fit every point along spline
-        % 0.0  Fit none of the points along the spline
-        % If a value above 0% is selected, the minimum number of points is 3
-        vXX = min(mNewSpline(:,1)):max(mNewSpline(:,1));
-        nLen = length(vXX);
-        nFit = round(nLen * g_tWT.MovieInfo.nTrackAccAdj); % number of points to fit
-        if nFit < 3 % minimum is 3 points
-            nFit = 3;
+    if g_tWT.RepositionOnly
+        nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
+        if g_tWT.MovieInfo.nTrackAccAdj > 0
+            % 1.0  Fit every point along spline
+            % 0.0  Fit none of the points along the spline
+            % If a value above 0% is selected, the minimum number of points is 3
+            vXX = min(mNewSpline(:,1)):max(mNewSpline(:,1));
+            nLen = length(vXX);
+            nFit = round(nLen * g_tWT.MovieInfo.nTrackAccAdj); % number of points to fit
+            if nFit < 3 % minimum is 3 points
+                nFit = 3;
+            end
+            vIndx = unique(round(linspace(1, nLen, nFit)));
+            [vXi, vYi] = wt_spline(mNewSpline(:,1), mNewSpline(:,2), vXX(vIndx));
+            mAdjustPoints = [vXi' vYi'];
+            
+            if nPoolSize > 1 % run parallel version (parfor loop)
+                mFullSpline = OptimizeWhiskerPlacementPar(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
+            else % run non-parellel code (for loop)
+                mFullSpline = OptimizeWhiskerPlacement(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
+            end
+            
+            [vX, vY] = wt_spline(mFullSpline(:,1), mFullSpline(:,2), mNewSpline(:,1));
+            if size(mFullSpline, 1) > 3
+                [vP] = polyfit(mFullSpline(:,1), mFullSpline(:,2), 3);
+                vX = mNewSpline(:,1);
+                vY = vP(1).*vX.^3 + vP(2).*vX.^2 + vP(3).*vX + vP(4);
+                mNewSpline = [vX vY];
+            else
+                mNewSpline = mFullSpline;
+            end
         end
-        vIndx = unique(round(linspace(1, nLen, nFit)));
-        [vXi, vYi] = wt_spline(mNewSpline(:,1), mNewSpline(:,2), vXX(vIndx));
-        mAdjustPoints = [vXi' vYi'];
-
-        if nPoolSize > 1 % run parallel version (parfor loop)
-            mFullSpline = OptimizeWhiskerPlacementPar(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
-        else % run non-parellel code (for loop)
-            mFullSpline = OptimizeWhiskerPlacement(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
-        end
-        
-        [vX, vY] = wt_spline(mFullSpline(:,1), mFullSpline(:,2), mNewSpline(:,1));
-        if size(mFullSpline, 1) > 3
-            [vP] = polyfit(mFullSpline(:,1), mFullSpline(:,2), 3);
-            vX = mNewSpline(:,1);
-            vY = vP(1).*vX.^3 + vP(2).*vX.^2 + vP(3).*vX + vP(4);
-            mNewSpline = [vX vY];
-        else
-            mNewSpline = mFullSpline;
-        end
-    end    
+    end
     g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurFrame,nChWhisker) = mNewSpline;
 end
 

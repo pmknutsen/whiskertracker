@@ -102,6 +102,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Track - Fast', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Auto Select Speed', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', ['wt_set_tracking_range()']);
+    uimenu(hFrameWin, 'Label','Reposition Whiskers', 'Parent', hWhiskers, 'Callback', ['wt_repositioning();wt_batch_redo(''wt_repositioning()'');'], 'checked', 'on');
     
     % Whisker labels
     hLabels = uimenu(hFrameWin, 'Label', 'Whisker Labels', 'Parent', hWhiskers, 'Separator', 'on');

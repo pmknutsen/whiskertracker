@@ -8,6 +8,7 @@ g_tWT.StopProc=0;
 
 sMethod = 'nearest'; % method of interpolation during image rotation
 
+if ~isfield(g_tWT, 'RepositionOnly') g_tWT.RepositionOnly = 0; end
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
 
 % Start matlabpool if not open already
@@ -62,6 +63,7 @@ for w = 1:size(g_tWT.MovieInfo.SplinePoints,4) % iterate over all whiskers
 end
 vIndx = vLastKnownFrames(:) ~= g_tWT.MovieInfo.LastFrame';
 nStartFrame = min(vLastKnownFrames(vIndx))+1;
+if g_tWT.RepositionOnly nStartFrame = 1; end
 
 counter = 1;
 % Iterate over all frames
@@ -136,9 +138,10 @@ for nStepRange = vTrackFrames
             % Skip whisker if its last frame has been reached
             if nRealFrameNumber > g_tWT.MovieInfo.LastFrame(w), continue, end
             
-            % Skip whisker if its position is known in CURRENT frame
+            % Skip whisker if its position is known in CURRENT frame,
+            % unless we are repositioning
             if ~(nRealFrameNumber > size(g_tWT.MovieInfo.SplinePoints, 3))
-                if any(g_tWT.MovieInfo.SplinePoints(:,1,nRealFrameNumber,w))
+                if any(g_tWT.MovieInfo.SplinePoints(:,1,nRealFrameNumber,w)) & ~g_tWT.RepositionOnly
                     continue;
                 end
             end

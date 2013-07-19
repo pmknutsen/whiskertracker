@@ -77,6 +77,7 @@ g_tWT.MovieInfo = struct('Roi', []);
 g_tWT.BatchMode = 0;
 g_tWT.Colors = distinguishable_colors(100);
 g_tWT.ParallelMode = 1;
+g_tWT.RepositionOnly = 0;
 
 wt_prep_gui
 
