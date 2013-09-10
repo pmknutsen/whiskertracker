@@ -27,6 +27,9 @@ end
 %%% DEBUG END
 
 % Crop
+if isempty(g_tWT.MovieInfo.Roi)
+    g_tWT.MovieInfo.Roi = [1 1 g_tWT.MovieInfo.Width-1 g_tWT.MovieInfo.Height-1];
+end
 if ~(g_tWT.MovieInfo.Roi(3:4)+1 == [g_tWT.MovieInfo.Height g_tWT.MovieInfo.Width])
     mImgOut = imcrop(mImgOut, g_tWT.MovieInfo.Roi);
 end

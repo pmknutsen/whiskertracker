@@ -104,12 +104,14 @@ end
 % Cell MEX routine
 if g_tWT.RepositionOnly
     % If we are only doing repositioning, grab already tracked location
-    mNewSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nCurFrame, nChWhisker));
+    %mNewSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nCurFrame, nChWhisker));
+    mNewSpline = round(mCurrSpline);
     nScore = 2;
     nScoreStd = 0;
     nScoreN = 0;
 else
     try
+        warning('off', 'MATLAB:mex:deprecatedExtension');
         [mNewSpline, nScore, nScoreStd, nScoreN] = find_next_whisker(mCurrSpline, mEnumRange, mImg, g_tWT.FiltVec, mVelMat );
     catch
         wt_error(lasterr, 'error')
