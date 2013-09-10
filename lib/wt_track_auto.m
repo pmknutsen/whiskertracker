@@ -63,7 +63,9 @@ for w = 1:size(g_tWT.MovieInfo.SplinePoints,4) % iterate over all whiskers
 end
 vIndx = vLastKnownFrames(:) ~= g_tWT.MovieInfo.LastFrame';
 nStartFrame = min(vLastKnownFrames(vIndx))+1;
-if g_tWT.RepositionOnly nStartFrame = 1; end
+if g_tWT.RepositionOnly
+    nStartFrame = round(get(g_tWT.Handles.hSlider, 'Value'));
+end
 
 counter = 1;
 % Iterate over all frames
