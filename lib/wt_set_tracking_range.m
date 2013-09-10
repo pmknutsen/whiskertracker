@@ -64,14 +64,14 @@ if ~any(mSpl(:)) return; end
 
 % Slow range
 vXX = min(mSpl(:,1)):max(mSpl(:,1));
-[~, vYY_mid_slow] = wt_spline(mSpl(:,1), mSpl(1:3,2), vXX);
-[~, vYY_top_slow] = wt_spline(mSpl(:,1), mSpl(1:3,2)+cumsum(vSlow'), vXX);
-[~, vYY_btm_slow] = wt_spline(mSpl(:,1), mSpl(1:3,2)-cumsum(vSlow'), vXX);
+[~, vYY_mid_slow] = wt_spline(mSpl(:,1), mSpl(:,2), vXX);
+[~, vYY_top_slow] = wt_spline(mSpl(:,1), mSpl(:,2)+cumsum(vSlow'), vXX);
+[~, vYY_btm_slow] = wt_spline(mSpl(:,1), mSpl(:,2)-cumsum(vSlow'), vXX);
 
 % Fast range
-[~, vYY_mid_fast] = wt_spline(mSpl(:,1), mSpl(1:3,2), vXX);
-[~, vYY_top_fast] = wt_spline(mSpl(:,1), mSpl(1:3,2)+cumsum(vFast'), vXX);
-[~, vYY_btm_fast] = wt_spline(mSpl(:,1), mSpl(1:3,2)-cumsum(vFast'), vXX);
+[~, vYY_mid_fast] = wt_spline(mSpl(:,1), mSpl(:,2), vXX);
+[~, vYY_top_fast] = wt_spline(mSpl(:,1), mSpl(:,2)+cumsum(vFast'), vXX);
+[~, vYY_btm_fast] = wt_spline(mSpl(:,1), mSpl(:,2)-cumsum(vFast'), vXX);
 
 % Update display
 hObjSlow = findobj(g_tWT.WTWindow, 'tag', 'spline_range_indicator_slow');
