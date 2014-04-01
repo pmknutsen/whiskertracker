@@ -9,6 +9,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "mex_utils.h"
 #include "matrix2d.h"
 #include "spline.h"
@@ -470,7 +471,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
   double *o_w,*o_score, *o_stddev, *o_n; /* variables for output to matlab */
   int i, j, k, count, npoints, ndims, number_of_dims;
   int nwhisker_points;
-  const int *dim_array;
+  const mwSize *dim_array;
   float score, stddev;
   int n_score;
   TMatrix2D image, velocity_mat;
@@ -480,7 +481,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
   int *enum_range_x,*enum_range_y;
   TMatrix2D *filters;
 
-  Mat2D_error = mexErrMsgTxt; /* set the error function of the TMatrix2D package to this */
+  /*Mat2D_error = mexErrMsgTxt; /* set the error function of the TMatrix2D package to this */
 
   if (nrhs != 5)
     mexErrMsgTxt("Five inputs required");

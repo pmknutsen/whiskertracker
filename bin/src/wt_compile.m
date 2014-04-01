@@ -7,25 +7,35 @@
 %
 
 clc
+disp('******* Compiling WhiskerTracker from C source *******')
 
-clear find_next_whisker
-clear rotate_matrix
+%clear find_next_whisker
+%clear rotate_matrix
 
-LINUX = 1;
-WINDOWS = 0;
+% Get path to ./bin/ directory
+sDir = which(mfilename);
+sDir = sDir(1:(end-length(mfilename)-6));
+
+%sDir(findstr(sDir, ' ')) = '\';
 
 if isunix
-
-    mex -inline find_next_whisker.c mex_utils.c matrix2d.c spline.c -outdir /home/home/Analysis/wt_dev_version/bin/linux/
+    % Compile for Linux
+    sTargetDir = [sDir 'linux'];
+    
+    eval(['mex find_next_whisker.c mex_utils.c matrix2d.c spline.c -outdir ''' sTargetDir ''''])
     %mex -inline rotate_matrix.c matrix2d.c
 
-elseif isunix
-
-    !del *.dll
-    mex -inline find_next_whisker.c mex_utils.c matrix2d.c spline.c -outdir ..\windows
+elseif ispc
+    % Compile for Windows
+    sTargetDir = [sDir 'windows'];
+    
+    %!del *.dll
+    eval(['mex -compatibleArrayDims -v find_next_whisker.c mex_utils.c matrix2d.c spline.c -outdir ''' sTargetDir ''''])
     %mex -inline rotate_matrix.c matrix2d.c
     
 else
-	disp()
-    
+	error('This platform is not supported')
 end
+
+
+return

@@ -62,7 +62,7 @@ void Mat2D_allocData(TMatrix2D mat)
 
   mat->data= (void **)mxMalloc(sizeof(void *)*mat->nRows);
   for (r= 0;r<mat->nRows;r++)
-    mat->data[r]= (void *)((int)data+r*mat->nCols*sizeElement);
+    mat->data[r]= (void *)((long int)data+r*mat->nCols*sizeElement);
 }
 
 void Mat2D_freeData(TMatrix2D mat)
@@ -147,7 +147,7 @@ TMatrix2D Mat2D_createSub(TMatrix2D mat,int rOrg,int cOrg,int nRows,int nCols)
 
   matDest->data= (void **)mxMalloc(sizeof(void *)*nRows);
   for (r= 0;r<matDest->nRows;r++)
-    matDest->data[r]= (void *)((int)(mat->data[r+rOrg])+cOrg*sizeElement);
+    matDest->data[r]= (void *)((long int)(mat->data[r+rOrg])+cOrg*sizeElement);
 
   return matDest;
 }
@@ -273,10 +273,10 @@ void Mat2D_loadFromMat(TMatrix2D mat,char *fileName)
 
   if ((in= fopen(fileName,"r"))== NULL) Mat2D_error("Ouverture du fichier impossible");
 
-  fgets(ch,128,in);
+  if(fgets(ch,128,in));
   if (strcmp(ch,"Matrix2D\n")!= 0) Mat2D_error("Format inconnu");
 
-  fgets(ch,128,in);
+  if(fgets(ch,128,in));
   if (strcmp(ch,"Char\n")== 0) Typ= MAT2D_CHAR;
   else
   if (strcmp(ch,"Short\n")== 0) Typ= MAT2D_SHORT;
@@ -289,11 +289,11 @@ void Mat2D_loadFromMat(TMatrix2D mat,char *fileName)
   else
     Mat2D_error("Format inconnu");
 
-  fgets(ch,128,in);
+  if(fgets(ch,128,in));
   sscanf(ch,"%d %d",&nRows,&nCols);
   Mat2D_resizeAndChangeType(mat,nRows,nCols,Typ);
 
-  fgets(ch,128,in);
+  if(fgets(ch,128,in));
 
   if (strcmp(ch,"Binary\n")== 0)
   /* Donnee sous forme binaire */
@@ -301,7 +301,7 @@ void Mat2D_loadFromMat(TMatrix2D mat,char *fileName)
     fclose(in);
     in= fopen(fileName,"rb");
     fseek(in,-(int)nRows*nCols*Mat2D_getElementSize(mat),SEEK_END);
-    fread(Mat2D_getAllData(mat),Mat2D_getElementSize(mat),nRows*nCols,in);
+    if(fread(Mat2D_getAllData(mat),Mat2D_getElementSize(mat),nRows*nCols,in));
   }
   else
   /* Donne sous forme texte */
@@ -312,11 +312,11 @@ void Mat2D_loadFromMat(TMatrix2D mat,char *fileName)
       {
         switch (Typ)
         {
-          case MAT2D_CHAR  : fscanf(in,"%d",&Mat2D_getDataChar(mat)[r][c]); break;
-          case MAT2D_SHORT : fscanf(in,"%h",&Mat2D_getDataShort(mat)[r][c]); break;
-          case MAT2D_LONG  : fscanf(in,"%l",&Mat2D_getDataLong(mat)[r][c]); break;
-          case MAT2D_FLOAT : fscanf(in,"%f",&Mat2D_getDataFloat(mat)[r][c]); break;
-          case MAT2D_DOUBLE: fscanf(in,"%lf",&Mat2D_getDataDouble(mat)[r][c]); break;
+          case MAT2D_CHAR  : if(fscanf(in, "%c", &Mat2D_getDataChar(mat)[r][c])); break;
+          case MAT2D_SHORT : if(fscanf(in, "%hi", &Mat2D_getDataShort(mat)[r][c])); break;
+          case MAT2D_LONG  : if(fscanf(in, "%li", &Mat2D_getDataLong(mat)[r][c])); break;
+          case MAT2D_FLOAT : if(fscanf(in, "%f", &Mat2D_getDataFloat(mat)[r][c])); break;
+          case MAT2D_DOUBLE: if(fscanf(in, "%lf", &Mat2D_getDataDouble(mat)[r][c])); break;
         }
       }
   }
@@ -395,7 +395,7 @@ TMatrix2D Mat2D_determinantAux(TMatrix2D matSrc,int exceptRow)
   rc= 0;
   for (r= 0;r<matSrc->nRows;r++)
     if (r!= exceptRow)
-      matDest->data[rc++]= (void *)((int)(matSrc->data[r])+sizeElement);
+      matDest->data[rc++]= (void *)((long int)(matSrc->data[r])+sizeElement);
 
   return matDest;
 }
@@ -1276,13 +1276,13 @@ void Mat2D_loadGrayFromPNM(TMatrix2D mat,char *fileName)
   unsigned int    nRows,nCols;
   int             maxValue;
   unsigned int    r,c,b,p;
-  unsigned char **data;
-  char            red,green,blue;
+  int             **data;
+  int            red,green,blue;
   char           *buffer;
 
   _PNM_readHeader(&in,fileName,&imageType,&isBinary,&nRows,&nCols,&maxValue);
   Mat2D_resizeAndChangeType(mat,nRows,nCols,MAT2D_CHAR);
-  data= (unsigned char **)Mat2D_getData(mat);
+  data= (int **)Mat2D_getData(mat);
 
   if (isBinary)
   {
@@ -1294,7 +1294,7 @@ void Mat2D_loadGrayFromPNM(TMatrix2D mat,char *fileName)
               buffer= mxMalloc(ceil((float)nCols/8));
               for (r= 0;r<nRows;r++)
               {
-                fread(buffer,1,ceil((float)nCols/8),in);
+                if(fread(buffer,1,ceil((float)nCols/8),in));
                 b= 8;
                 p= -1;
                 for (c= 0;c<nCols;c++)
@@ -1311,17 +1311,17 @@ void Mat2D_loadGrayFromPNM(TMatrix2D mat,char *fileName)
               mxFree(buffer);
               break;
       case 2: fseek(in,-(int)nRows*nCols,SEEK_END);
-              fread(Mat2D_getAllData(mat),1,nCols*nRows,in); break;
+              if(fread(Mat2D_getAllData(mat),1,nCols*nRows,in)); break;
       case 3: fseek(in,-(int)nRows*nCols*3,SEEK_END);
               buffer= mxMalloc(nCols*3);
               for (r= 0;r<nRows;r++)
               {
-                fread(buffer,1,nCols*3,in);
+                if(fread(buffer,1,nCols*3,in));
                 for (c= 0;c<nCols;c++)
                 {
-                  data[r][c]= ((unsigned char)buffer[c*3]+
-                               (unsigned char)buffer[c*3+1]+
-                               (unsigned char)buffer[c*3+2])/3;
+                  data[r][c]= ((int)buffer[c*3]+
+                               (int)buffer[c*3+1]+
+                               (int)buffer[c*3+2])/3;
                 }
               }
               mxFree(buffer);
@@ -1336,10 +1336,10 @@ void Mat2D_loadGrayFromPNM(TMatrix2D mat,char *fileName)
         switch (imageType)
         {
           case 1: ; /* Meme cas que le 2 */
-          case 2: fscanf(in,"%d",&data[r][c]); break;
-          case 3: fscanf(in,"%d",&red);
-                  fscanf(in,"%d",&green);
-                  fscanf(in,"%d",&blue);
+          case 2: if(fscanf(in,"%d",&data[r][c])); break;
+          case 3: if(fscanf(in,"%d",&red));
+                  if(fscanf(in,"%d",&green));
+                  if(fscanf(in,"%d",&blue));
                   data[r][c]= ((int)red+(int)green+(int)blue)/3; break;
         }
       }
@@ -1350,7 +1350,7 @@ void Mat2D_loadGrayFromPNM(TMatrix2D mat,char *fileName)
     if (maxValue!= 255)  /* Ajuster sur 255 */
       for (r= 0;r<nRows;r++)
         for (c= 0;c<nCols;c++)
-          data[r][c]= ((unsigned char)data[r][c])*255/maxValue;
+          data[r][c]= ((int)data[r][c])*255/maxValue;
 }
 
 void Mat2D_loadRGBFromPNM(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fileName)
@@ -1360,17 +1360,17 @@ void Mat2D_loadRGBFromPNM(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
   unsigned int    nRows,nCols;
   int             maxValue;
   unsigned int    r,c,b,p;
-  unsigned char **dataR,**dataG,**dataB;
-  char            red,green,blue;
+  int             **dataR,**dataG,**dataB;
+  int            red,green,blue;
   char           *buffer;
 
   _PNM_readHeader(&in,fileName,&imageType,&isBinary,&nRows,&nCols,&maxValue);
   Mat2D_resizeAndChangeType(matR,nRows,nCols,MAT2D_CHAR);
   Mat2D_resizeAndChangeType(matG,nRows,nCols,MAT2D_CHAR);
   Mat2D_resizeAndChangeType(matB,nRows,nCols,MAT2D_CHAR);
-  dataR= (unsigned char **)Mat2D_getData(matR);
-  dataG= (unsigned char **)Mat2D_getData(matG);
-  dataB= (unsigned char **)Mat2D_getData(matB);
+  dataR= (int **)Mat2D_getData(matR);
+  dataG= (int **)Mat2D_getData(matG);
+  dataB= (int **)Mat2D_getData(matB);
 
   if (isBinary)
   {
@@ -1382,7 +1382,7 @@ void Mat2D_loadRGBFromPNM(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
               buffer= mxMalloc(ceil((float)nCols/8));
               for (r= 0;r<nRows;r++)
               {
-                fread(buffer,1,ceil((float)nCols/8),in);
+                if(fread(buffer,1,ceil((float)nCols/8),in));
                 b= 8;
                 p= -1;
                 for (c= 0;c<nCols;c++)
@@ -1401,7 +1401,7 @@ void Mat2D_loadRGBFromPNM(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
               mxFree(buffer);
               break;
       case 2: fseek(in,-(int)nRows*nCols,SEEK_END);
-              fread(Mat2D_getAllData(matR),1,nCols*nRows,in);
+              if(fread(Mat2D_getAllData(matR),1,nCols*nRows,in));
               for (r= 0;r<nRows;r++)
                 for (c= 0;c<nCols;c++)
                 {
@@ -1413,7 +1413,7 @@ void Mat2D_loadRGBFromPNM(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
               buffer= mxMalloc(nCols*3);
               for (r= 0;r<nRows;r++)
               {
-                fread(buffer,1,nCols*3,in);
+                if(fread(buffer,1,nCols*3,in));
                 for (c= 0;c<nCols;c++)
                 {
                   dataR[r][c]= buffer[c*3];
@@ -1433,13 +1433,13 @@ void Mat2D_loadRGBFromPNM(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
         switch (imageType)
         {
           case 1: ; /* Meme cas que le 2 */
-          case 2: fscanf(in,"%d",&dataR[r][c]);
+          case 2: if(fscanf(in,"%d",&dataR[r][c]));
                   dataG[r][c]= dataR[r][c];
                   dataB[r][c]= dataR[r][c];
                   break;
-          case 3: fscanf(in,"%d",&red);
-                  fscanf(in,"%d",&green);
-                  fscanf(in,"%d",&blue);
+          case 3: if(fscanf(in,"%d",&red));
+                  if(fscanf(in,"%d",&green));
+                  if(fscanf(in,"%d",&blue));
                   dataR[r][c]= red;
                   dataG[r][c]= green;
                   dataB[r][c]= blue;
@@ -1577,11 +1577,11 @@ void Mat2D_loadRGBFromTGA(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
   ImageType= getc(in);
   if (ImageType!= 2) Mat2D_error("Image non True-Color");
 
-  fread(ColorMapSpecification,1,5,in);
-  fread(&XOrigin,1,2,in);
-  fread(&YOrigin,1,2,in);
-  fread(&Width,1,2,in);
-  fread(&Height,1,2,in);
+  if(fread(ColorMapSpecification,1,5,in));
+  if(fread(&XOrigin,1,2,in));
+  if(fread(&YOrigin,1,2,in));
+  if(fread(&Width,1,2,in));
+  if(fread(&Height,1,2,in));
   PixelDepth= getc(in);
   ImageDescriptor= getc(in);
   if (ImageDescriptor>8) Mat2D_error("Format non support�");
@@ -1600,7 +1600,7 @@ void Mat2D_loadRGBFromTGA(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
     case 16: buffer= mxMalloc(Width*2);
              for (r= 0;r<Height;r++)
              {
-               fread(buffer,1,Width*2,in);
+               if(fread(buffer,1,Width*2,in));
                for (c= 0;c<Width;c++)
                {
                  /* red=5Bits,green=6Bits,blue=5Bits */
@@ -1614,7 +1614,7 @@ void Mat2D_loadRGBFromTGA(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
     case 24: buffer= mxMalloc(Width*3);
              for (r= 0;r<Height;r++)
              {
-               fread(buffer,1,Width*3,in);
+               if(fread(buffer,1,Width*3,in));
                for (c= 0;c<Width;c++)
                {
                  dataR[Height-1-r][c]= buffer[c*3+2];
@@ -1627,7 +1627,7 @@ void Mat2D_loadRGBFromTGA(TMatrix2D matR,TMatrix2D matG,TMatrix2D matB,char *fil
     case 32: buffer= mxMalloc(Width*4);
              for (r= 0;r<Height;r++)
              {                          
-               fread(buffer,1,Width*4,in);
+               if(fread(buffer,1,Width*4,in));
                for (c= 0;c<Width;c++)
                {
                  dataR[Height-1-r][c]= buffer[c*4+2];
