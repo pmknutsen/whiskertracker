@@ -1,5 +1,8 @@
-% WT_CROP_BEHAVING_VIDEO
+function mCropImg = wt_crop_behaving_video(mImg, mCoords, hor_ext, rad_ext, method);
+% wt_crop_behaving_video
+%
 % Extract region of interest parallel to whisker-pad.
+%
 % wt_crop_behaving_video(M, C, HOR, RAD, METHOD), where
 %   M is the loaded frame
 %   C is a 3-by-2 vector containing X Y coordinates of right-eye, left-eye
@@ -9,14 +12,9 @@
 %   METHOD is the interpolation method used when rotating the extracted
 %     region, either 'linear' (fast) or 'bicubic' (slow, but better).
 %
+%
 
-function mCropImg = wt_crop_behaving_video(mImg, mCoords, hor_ext, rad_ext, method);
 global g_tWT
-
-% Resize cropping parameters according to the ersize factor
-%hor_ext = hor_ext * g_tWT.MovieInfo.ResizeFactor;
-%rad_ext = rad_ext * g_tWT.MovieInfo.ResizeFactor;
-%mCoords = mCoords * g_tWT.MovieInfo.ResizeFactor;
 
 bDebug = g_tWT.VerboseMode;
 switch lower(method)
@@ -46,9 +44,11 @@ if bDebug
     hFig = findobj('Tag', 'CROP_FRAME_WINDOW');
     if isempty(hFig)
         hFig = figure;
-        set(hFig, 'Tag', 'CROP_FRAME_WINDOW', 'DoubleBuffer', 'on', 'Name', 'WT - CROP_FRAME_WINDOW', 'numbertitle', 'off')
-    else, figure(hFig), end
-    clf;
+        set(hFig, 'Tag', 'CROP_FRAME_WINDOW', 'DoubleBuffer', 'on', 'toolbar', 'none', ...
+            'Name', ['WT Debug - ' mfilename], 'numbertitle', 'off', 'position', [1 1 700 200])
+        centerfig(hFig)
+    end
+    colormap gray
 end
 
 nPadFact = 4;
@@ -140,8 +140,6 @@ for e = 1:2 % 1=right 2=left
     % crop again so only the relevant section is included in final image
     % We have replaced the two lines below with parameters defined earlier
     % in the global namespace, as we want all frames to have the same size.
-    %new_w = round(rad_ext);
-    %new_h = round(hor_ext*2 + sqrt(sum([mCoords(3,1)-mCoords(e,1) mCoords(3,2)-mCoords(e,2)].^2))); %end
     new_w = g_tWT.MovieInfo.ImCropSize(1);% * g_tWT.MovieInfo.ResizeFactor;
     new_h = g_tWT.MovieInfo.ImCropSize(2);% * g_tWT.MovieInfo.ResizeFactor;
 
@@ -150,22 +148,25 @@ for e = 1:2 % 1=right 2=left
     mCropImg{e} = mTemp(round(y:y+new_h), round(x:x+new_w));
 
     if bDebug
-        subplot(1,4,e+2)
-        imagesc(mCropImg{e}); SetPlotProps;
+        hAx = subplot(1,4,e+2, 'parent', hFig);
+        imagesc(mCropImg{e}, 'parent', hAx);
+        set(hAx, 'xtick', [], 'ytick', [])
+        axis(hAx, 'image')
     end
     
 end
 
 % Plot
 if bDebug
-    subplot(1,4,1:2)
-    imagesc(mImg(hor_ext:size(mImg,1)-hor_ext,rad_ext:size(mImg,2)-rad_ext))
-    title('Original')
-    colormap gray; hold on
-    scatter(mCoords(:,1),mCoords(:,2),'g.') % eyes/nose
-    scatter(new_coords(:,1)-rad_ext, new_coords(:,2)-hor_ext, 'r.') % rect coords
-    plot(new_coords([1 2 3 4 1], 1)-rad_ext, new_coords([1 2 3 4 1], 2)-hor_ext, 'r')
-    SetPlotProps;
+    hAx = subplot(1,4,1:2, 'parent', hFig);
+    imagesc(mImg(hor_ext:size(mImg,1)-hor_ext,rad_ext:size(mImg,2)-rad_ext), 'parent', hAx)
+    title(hAx, 'Original')
+    hold on
+    scatter(hAx, mCoords(:,1),mCoords(:,2),'g.') % eyes/nose
+    scatter(hAx, new_coords(:,1)-rad_ext, new_coords(:,2)-hor_ext, 'r.') % rect coords
+    plot(hAx, new_coords([1 2 3 4 1], 1)-rad_ext, new_coords([1 2 3 4 1], 2)-hor_ext, 'r')
+    set(hAx, 'xtick', [], 'ytick', [])
+    axis(hAx, 'image')
     drawnow
 end
 
@@ -181,8 +182,4 @@ mCropImg{2} = mCropImg{2}(1:min_height, 1:min_width);
 % flip right rectangle horizontally
 mCropImg{1} = fliplr(mCropImg{1});
 
-return;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function SetPlotProps
-set(gca, 'xtick', [], 'ytick', [])
+return
