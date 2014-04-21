@@ -36,7 +36,7 @@ Note that some features of the application does not depend on the compiled parts
 
 ###Report bugs
 Please report errors, bugs and feature requests using the Issues tracker:
-[[https://github.com/pmknutsen/whiskertracker/issues]].
+https://github.com/pmknutsen/whiskertracker/issues.
 
 ###Reference
 Please cite the following reference in any publication using this work:
