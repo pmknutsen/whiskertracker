@@ -35,7 +35,8 @@ A 64 bit version for Windows will be added in a future update. Source code is in
 Note that some features of the application does not depend on the compiled parts of the code.
 
 ###Report bugs
-Please report errors, bugs and feature requests via [[Issues|https://github.com/pmknutsen/whiskertracker/issues]].
+Please report errors, bugs and feature requests using the Issues tracker:
+[[https://github.com/pmknutsen/whiskertracker/issues]].
 
 ###Reference
 Please cite the following reference in any publication using this work:
