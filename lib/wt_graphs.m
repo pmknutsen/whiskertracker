@@ -1,5 +1,5 @@
 function wt_graphs( varargin )
-% WT_GRAPHS
+% wt_graphs
 % Organize and create graphs
 %
 % Usage:
@@ -13,11 +13,16 @@ function wt_graphs( varargin )
 %   VAR     angle
 %           curvature
 %   TGL     Toggle parameter ON/OFF
-%           
+% 
 
 global g_tWT
 persistent p_vRefLine p_vPlotWhichWhiskers p_cActivePlots p_nAngleDelta
 
+% Quit silently if no file has been loaded
+if ~isfield(g_tWT.MovieInfo, 'Filename')
+    return
+end
+    
 % Determine which plots to show
 if nargin ~= 2
     % Reset all parameters (e.g. when menu is closed)
