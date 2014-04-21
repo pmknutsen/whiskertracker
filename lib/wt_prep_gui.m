@@ -26,19 +26,22 @@ sPath = [sPath(1:end-4) 'icons/'];
 hToolbar = uitoolbar('Parent', g_tWT.WTWindow, 'Tag', 'WT_Toolbar');
 
 mCData = im2double(imread([sPath 'tool_open.png'])); mCData(mCData == 0) = NaN; % open
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'WT_Toolbar_Open', 'TooltipString', 'Open file', 'ClickedCallback', ['wt_select_file']);
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'WT_Toolbar_Open', 'TooltipString', 'Open file', 'ClickedCallback', 'wt_select_file');
 
 mCData = im2double(imread([sPath 'tool_save.png'])); mCData(mCData == 0) = NaN; % save
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'WT_Toolbar_Save', 'TooltipString', 'Save', 'ClickedCallback', ['wt_save_data']);
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'WT_Toolbar_Save', 'TooltipString', 'Save', 'ClickedCallback', 'wt_save_data');
 
 mCData = im2double(imread([sPath 'tool_zoom_in.png'])); mCData(mCData == 0) = NaN; % zoom in
 uitoggletool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_ZoomOut', 'TooltipString', 'Zoom in', 'ClickedCallback', ['switch get(gcbo,''state''),case ''on'',zoom on; case ''off'',zoom off;end'], 'separator', 'on');
 
 [mCData, mCM] = imread([sPath 'tools_table.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_EditParameters', 'TooltipString', 'Edit Parameters', 'ClickedCallback', ['wt_set_parameters']);
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_EditParameters', 'TooltipString', 'Edit Parameters', 'ClickedCallback', 'wt_set_parameters');
 
 mCData = im2double(imread([sPath 'tool_plottools_show.png'])); mCData(mCData == 0) = NaN;
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Auto-resize window', 'ClickedCallback', ['wt_autosize_window']);
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Auto-resize window', 'ClickedCallback', 'wt_autosize_window');
+
+mCData = im2double(imread([sPath 'tool_plot.png']));
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'WT_Toolbar_Plot', 'TooltipString', 'Graph tracking results', 'ClickedCallback', 'wt_graphs');
 
 [mCData, mCM] = imread([sPath 'tool_rotate_counterclockwise.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateAntiClockwise', 'TooltipString', 'Rotate Counter-Clockwise', 'ClickedCallback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')'], 'separator', 'on');
