@@ -18,7 +18,7 @@ g_tWT.FrameAx = axes;
 set(g_tWT.FrameAx, 'Visible', 'off', ...
     'buttondownfcn', ['global g_tWT; g_sLastBtnPress = get(gcf,''selectiontype'')'], ...
     'DrawMode', 'fast', ...
-    'Position', [.03 .06 .94 .9] );
+    'Position', [.025 .075 .95 .93] );
 
 % Create toolbar
 sPath = which('wt');
@@ -48,7 +48,6 @@ uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_Rota
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Flip Horizontally', 'ClickedCallback', ['wt_flip_frame(''leftright''); wt_batch_redo(''wt_flip_frame(''''leftright'''')'')']);
 [mCData, mCM] = imread([sPath 'tool_flip_vertical.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % parameters
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Flip Vertically', 'ClickedCallback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')']);
-
 
 [mCData, mCM] = imread([sPath 'right.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking SLOW
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''slow'')'], 'separator', 'on');
@@ -93,15 +92,15 @@ if ~isempty(g_tWT.Movies)
 
     % Whiskers
     hWhiskers = uimenu(hFrameWin, 'Label', 'Whiskers');
-    uimenu(hFrameWin, 'Label','New...', 'Parent', hWhiskers, 'Callback', ['wt_mark_whisker'], 'accelerator', 'W');
+    uimenu(hFrameWin, 'Label','New...', 'Parent', hWhiskers, 'Callback', 'wt_mark_whisker', 'accelerator', 'W');
     uimenu(hFrameWin, 'Label','Paste', 'Parent', hWhiskers, 'Callback', ['wt_copy_paste_whisker(''paste'', NaN); wt_batch_redo(''wt_copy_paste_whisker(''''paste'''', NaN)'');'], 'accelerator', 'V', 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Delete...', 'Parent', hWhiskers, 'Callback', ['wt_clear_selected_whisker']);
+    uimenu(hFrameWin, 'Label','Delete...', 'Parent', hWhiskers, 'Callback', 'wt_clear_selected_whisker');
     uimenu(hFrameWin, 'Label','Delete All', 'Parent', hWhiskers, 'Callback', ['wt_clear_whisker(''all''); wt_batch_redo(''wt_clear_whisker(''''all'''')'')'], 'checked', 'on');
 
     uimenu(hFrameWin, 'Label','Track - Slow', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on', 'checked', 'on');
     uimenu(hFrameWin, 'Label','Track - Fast', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Auto Select Speed', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', ['wt_set_tracking_range()']);
+    uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', 'wt_set_tracking_range()');
     uimenu(hFrameWin, 'Label','Reposition Whiskers', 'Parent', hWhiskers, 'Callback', ['wt_repositioning();wt_batch_redo(''wt_repositioning()'');'], 'checked', 'on');
     
     % Whisker labels
@@ -113,7 +112,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Extend Whiskers', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Label Names', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity')
 
-    uimenu(hFrameWin, 'Label','Set Last Frame...', 'Parent', hWhiskers, 'Callback', ['wt_set_last_frame'], 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Set Last Frame...', 'Parent', hWhiskers, 'Callback', 'wt_set_last_frame', 'Separator', 'on');
     uimenu(hFrameWin, 'Label', 'Whisker Display Width...', 'Parent', hWhiskers, 'Callback', 'wt_change_whisker_width')
     uimenu(hFrameWin, 'Label', 'Show Whisker Identities', 'Parent', hWhiskers, 'Callback', 'wt_toggle_show_identity')
     uimenu(hFrameWin, 'Label', 'Hide Whiskers', 'Parent', hWhiskers, 'Callback', 'wt_toggle_whisker_visibility')
@@ -198,30 +197,30 @@ for f = 1:length(tFiles)
 end
 
 if ~isempty(g_tWT.Movies)
-    uimenu(hFrameWin, 'Label', 'Batch Redo', 'Parent', hOptions, 'Callback', ['wt_batch_redo(''redo'')'], 'accelerator', 'B');
+    uimenu(hFrameWin, 'Label', 'Batch Redo', 'Parent', hOptions, 'Callback', 'wt_batch_redo(''redo'')', 'accelerator', 'B');
 
-    uimenu(hFrameWin, 'Label', 'Parameters...', 'Parent', hOptions, 'Callback', ['wt_set_parameters'], 'accelerator', 'P');
+    uimenu(hFrameWin, 'Label', 'Parameters...', 'Parent', hOptions, 'Callback', 'wt_set_parameters', 'accelerator', 'P');
     uimenu(hFrameWin, 'Label', 'User Variables...', 'Parent', hOptions, 'Callback', ['wt_user_variables;wt_batch_redo(''wt_user_variables(''''copyfrommem'''')'')'], 'accelerator', 'U', 'checked', 'on');
 
-    uimenu(hFrameWin, 'Label','Signal-to-Noise', 'Parent', hOptions, 'Callback', ['wt_toggle_signal_noise'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Notes...', 'Parent', hOptions, 'Callback', ['wt_edit_notes'], 'accelerator', 'e');
-    uimenu(hFrameWin, 'Label','Debug Window', 'Parent', hOptions, 'Callback', ['wt_toggle_verbose']);
-    uimenu(hFrameWin, 'Label','Use Parallel Processing', 'Parent', hOptions, 'Callback', ['wt_toggle_parallel'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Compress Datafiles', 'Parent', hOptions, 'Callback', ['wt_toggle_datacompress'], 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Uncompress Movie', 'Parent', hOptions, 'Callback', ['wt_uncompress_movie']);
-    uimenu(hFrameWin, 'Label','Play Movie', 'Parent', hOptions, 'Callback', ['wt_play_movie'], 'Separator', 'on', 'accelerator', 'M');
+    uimenu(hFrameWin, 'Label','Signal-to-Noise', 'Parent', hOptions, 'Callback', 'wt_toggle_signal_noise', 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Notes...', 'Parent', hOptions, 'Callback', 'wt_edit_notes', 'accelerator', 'e');
+    uimenu(hFrameWin, 'Label','Debug Window', 'Parent', hOptions, 'Callback', 'wt_toggle_verbose');
+    uimenu(hFrameWin, 'Label','Use Parallel Processing', 'Parent', hOptions, 'Callback', 'wt_toggle_parallel', 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Compress Datafiles', 'Parent', hOptions, 'Callback', 'wt_toggle_datacompress', 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Uncompress Movie', 'Parent', hOptions, 'Callback', 'wt_uncompress_movie');
+    uimenu(hFrameWin, 'Label','Play Movie', 'Parent', hOptions, 'Callback', 'wt_play_movie', 'Separator', 'on', 'accelerator', 'M');
     uimenu(hFrameWin, 'Label','Movie Preview', 'Parent', hOptions, 'Callback', ['wt_play_movie(''preview''); wt_batch_redo(''wt_play_movie(''''preview'''')'');'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Save Movie', 'Parent', hOptions, 'Callback', ['wt_play_movie(''save'')']);
-    uimenu(hFrameWin, 'Label','Dump Screen...', 'Parent', hOptions, 'Callback', ['wt_dump_screen'], 'Separator', 'on');
+    uimenu(hFrameWin, 'Label','Save Movie', 'Parent', hOptions, 'Callback', 'wt_play_movie(''save'')');
+    uimenu(hFrameWin, 'Label','Dump Screen...', 'Parent', hOptions, 'Callback', 'wt_dump_screen', 'Separator', 'on');
 end
 
 % Help menu
 hHelp = uimenu(hFrameWin, 'Label', 'Help');
-uimenu(hFrameWin, 'Label','&Tip of the day', 'Parent', hHelp, 'Callback', ['wt_tip_of_the_day']);
-uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', ['wt_get_build_number']);
-uimenu(hFrameWin, 'Label','&Check for Updates', 'Parent', hHelp, 'Callback', ['wt_check_update']);
-uimenu(hFrameWin, 'Label','&License', 'Parent', hHelp, 'Callback', ['wt_show_license']);
-uimenu(hFrameWin, 'Label','&About WT', 'Parent', hHelp, 'Callback', ['wt_about_wt']);
+uimenu(hFrameWin, 'Label','&Tip of the day', 'Parent', hHelp, 'Callback', 'wt_tip_of_the_day');
+uimenu(hFrameWin, 'Label','&Version', 'Parent', hHelp, 'Callback', 'wt_get_build_number');
+uimenu(hFrameWin, 'Label','&Check for Updates', 'Parent', hHelp, 'Callback', 'wt_check_update');
+uimenu(hFrameWin, 'Label','&License', 'Parent', hHelp, 'Callback', 'wt_show_license');
+uimenu(hFrameWin, 'Label','&About WT', 'Parent', hHelp, 'Callback', 'wt_about_wt');
 
 if ~isempty(g_tWT.Movies)
     % 'Go to frame' push-button
@@ -267,7 +266,7 @@ if ~isempty(g_tWT.Movies)
     g_tWT.Handles.hStatusText = uicontrol(g_tWT.WTWindow, 'units', 'normalized' ...
         , 'Position', [.02 .005 .96 .02] ...
         , 'Style', 'text' ...
-        , 'fontsize', 8 ...
+        , 'fontsize', 9 ...
         , 'horizontalalignment', 'left' ...
         , 'String', '' ...
         , 'Tag', 'statustext' ...
@@ -304,15 +303,12 @@ uimenu(hFrameWin, 'Label','E&xit WT', 'Parent', hFile, 'Callback', ['wt_exit'], 
 set(hFrameWin, 'keypressfcn', @FigKeyPressExec)
 set(g_tWT.WTWindow, 'visible', 'on')
 
-
 return % end of main function
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function FigKeyPressExec( varargin )
-
 global g_tWT
-
 sKey = lower(get(gcf, 'currentcharacter'));
 
 % If pressed key is a number, then go that number of frames back from
@@ -341,14 +337,13 @@ if strcmp(' ', sKey)
         else g_tWT.StopProc = 1; end
     end
 end
-
+return
 
 function GoToFrame(varargin)
 sF = inputdlg('Go to frame', 'Go to frame', 1);
 if isempty(sF), return
 else wt_display_frame(str2num(char(sF))); end
-return;
-
+return
 
 function GotoFirstFrame(varargin)
 global g_tWT
@@ -356,8 +351,7 @@ if ~isempty(g_tWT.MovieInfo.Nose)
     f = find(~isnan(g_tWT.MovieInfo.Nose(:,1)));
 else f = 1; end
 wt_display_frame(f(1));
-return;
-
+return
 
 function GotoLastFrame(varargin)
 global g_tWT
@@ -367,5 +361,4 @@ else
     f = g_tWT.MovieInfo.NumFrames;
 end
 wt_display_frame(f);
-return;
-
+return

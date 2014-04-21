@@ -1,4 +1,5 @@
-% WT_ROTATE_COORDS
+function vNewCoords = wt_rotate_coords(vCoords, sDirection, vRightEye, vLeftEye, vNose, nSide, vImCropSize, nRadExt, nHorExt)
+% wt_rotate_coords
 % Transform coordinates of objects or whiskers between absolute and
 % relative framework. A note on transformations:
 %   Absolute coordinates are in the framework of the actual image
@@ -17,9 +18,6 @@
 %               1 = right
 %               2 = left
 %
-
-function vNewCoords = wt_rotate_coords(vCoords, sDirection, vRightEye, vLeftEye, vNose, nSide, ...
-    vImCropSize, nRadExt, nHorExt)
 
 % Return immediately if object position is not given for current whiskers
 if sum(vCoords) == 0, return; end

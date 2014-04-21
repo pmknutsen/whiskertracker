@@ -12,14 +12,15 @@ function wt_mark_whisker(varargin)
 %               'setlastframe'  - mark the last frame on which to track the
 %                                   whisker
 %
-% The default subroutine is 'new'. For all other subroutines, 
+% The default subroutine is 'new'. For all other subroutines,
 % you must provide a second parameter which is the whisker ID/index
 % to modify.
+%
 
 if nargin >= 1
     sSub = varargin{1};
     nW = varargin{2};
-else, sSub = 'new'; end
+else sSub = 'new'; end
 
 switch sSub
     case 'new'
@@ -39,7 +40,7 @@ end
 
 wt_display_frame % refresh current frame
 
-return;
+return
 
 %%%% MARKNEWWHISKER %%%%%%%%%%%%%%%%%%%%%%%
 function MarkNewWhisker
@@ -60,9 +61,11 @@ vX = []; vY = [];
 hDots = [];
 try
     for i = 1:3
-            [vX(i), vY(i)] = ginput(1);  % user can hit RETURN
-            hDots(end+1) = line(vX(i), vY(i));
-            set(hDots(end), 'color', 'g', 'marker', '.')
+        wt_set_status('Click to select 3 locations along whisker, or Return to cancel.')
+        [vX(i), vY(i)] = ginput(1);  % user can hit Return to cancel
+        wt_set_status('')
+        hDots(end+1) = line(vX(i), vY(i));
+        set(hDots(end), 'color', 'g', 'marker', '.')
     end
 catch
     return  % in case the user did not input data but instead hit RETURN
@@ -72,7 +75,7 @@ delete(hDots)
 % Sort points
 mCoords = round(sortrows([vX' vY']));
 
-% If this is a two-sided frame, detect which side this whisker belongs to
+% If this is a two-sided frame (i.e. head tracked), detect which side this whisker belongs to
 nCurrentFrame = get(g_tWT.Handles.hSlider, 'Value');
 if ~isempty(g_tWT.MovieInfo.EyeNoseAxLen)
     if ~isnan(prod(g_tWT.MovieInfo.Nose(nCurrentFrame, :))) % head is known only if nose is known
@@ -87,12 +90,16 @@ if ~isempty(g_tWT.MovieInfo.EyeNoseAxLen)
             mCoords(:,1) = mCoords(:,1) - vAxSize(2)/2; % only change X
             nSide = 2;
         end
-    else, nSide = 1; end
-else nSide = 1; end
+    else
+        nSide = 1;
+    end
+else
+    nSide = 1;
+end
 
 % Save whisker splinepoints
 if isempty(g_tWT.MovieInfo.SplinePoints), nIndx = 1;
-else, nIndx = size(g_tWT.MovieInfo.SplinePoints, 4) + 1; end
+else nIndx = size(g_tWT.MovieInfo.SplinePoints, 4) + 1; end
 g_tWT.MovieInfo.SplinePoints(1:3, 1:2, nFirstFrame, nIndx) = mCoords;% ./ g_tWT.MovieInfo.ResizeFactor;
 g_tWT.MovieInfo.Angle(nFirstFrame, nIndx) = 0;
 g_tWT.MovieInfo.Intersect(nFirstFrame, 1:2, nIndx) = [0 0];
@@ -103,8 +110,7 @@ g_tWT.MovieInfo.LastFrame(nIndx) = g_tWT.MovieInfo.NumFrames;
 % Set whisker identity
 wt_set_identity(nIndx);
 
-return;
-
+return
 
 %%%% ADDPOINT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function AddPoint(nW)
@@ -128,12 +134,12 @@ while 1
     if g_tWT.MovieInfo.WhiskerSide(nW) == 2
         nX = nX - vAxSize(2)/2;
     end
-    if nX <= max(mWhisker(:,1)) & nX >= min(mWhisker(:,1)), break
+    if nX <= max(mWhisker(:,1)) && nX >= min(mWhisker(:,1)), break
     else
         sAns = questdlg('The marked point is outside boundaries of current whisker.', ...
             'Error in input', ...
             'Try again', 'Cancel', 'Try again' );
-       if strcmp(sAns, 'Cancel'), return; end
+        if strcmp(sAns, 'Cancel'), return; end
     end
 end
 
@@ -169,7 +175,7 @@ if g_tWT.MovieInfo.WhiskerSide(nW) == 2
 end
 
 % Find closest point (only 2nd or 3rd)
-[y, nIndx] = min(sqrt(abs(mWhisker(2:3,1)-nX).^2 + abs(mWhisker(2:3,2)-nY).^2));
+[~, nIndx] = min(sqrt(abs(mWhisker(2:3,1)-nX).^2 + abs(mWhisker(2:3,2)-nY).^2));
 nIndx = nIndx + 1;
 % Verify removal of point
 sAns = questdlg(sprintf('You have chosen to delete point number %d from the left. Please confirm.', nIndx), ...
@@ -205,7 +211,7 @@ return;
 
 
 %%%% SETFULLLENGTH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function SetFullLength(nW);
+function SetFullLength(nW)
 global g_tWT
 
 if ~isfield(g_tWT.MovieInfo, 'WhiskerLength')

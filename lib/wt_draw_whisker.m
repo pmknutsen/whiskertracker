@@ -1,5 +1,6 @@
 function wt_draw_whisker(w, nCurrentFrame, varargin)
-% WT_DRAW_WHISKER
+% wt_draw_whisker
+%
 % Syntax:
 %  wt_draw_whisker
 %  wt_draw_whisker('nomenu')  Draw whisker without context menu
@@ -8,7 +9,9 @@ function wt_draw_whisker(w, nCurrentFrame, varargin)
 global g_tWT
 
 sOption = [];
-if nargin==3, sOption = varargin{1}; end
+if nargin==3
+    sOption = varargin{1};
+end
 
 bDelWhisker = 0;
 
@@ -41,7 +44,10 @@ end
 
 % Calculate spline that defines whisker
 vXX = min(vX):max(vX);
-try [vXX, vYY] = wt_spline(vX, vY, vXX); end
+try
+    [vXX, vYY] = wt_spline(vX, vY, vXX);
+end
+
 % Transform coordinates between frameworks, if necessary
 if ~g_tWT.DisplayMode % relative to absolute, coordinates are always stored in relative coordinates
     mCoords = wt_rotate_coords([vXX' vYY'], ...
@@ -54,7 +60,7 @@ if ~g_tWT.DisplayMode % relative to absolute, coordinates are always stored in r
         g_tWT.MovieInfo.RadExt, ...
         g_tWT.MovieInfo.HorExt );
     vXX = mCoords(:,1);
-    vYY = mCoords(:,2)-5;
+    vYY = mCoords(:,2)-2;
     mCoords = wt_rotate_coords([vX vY], ...
         'rel2abs', ...
         g_tWT.MovieInfo.RightEye(nCurrentFrame,:), ...
@@ -65,7 +71,7 @@ if ~g_tWT.DisplayMode % relative to absolute, coordinates are always stored in r
         g_tWT.MovieInfo.RadExt, ...
         g_tWT.MovieInfo.HorExt );
     vX = mCoords(:,1);
-    vY = mCoords(:,2);
+    vY = mCoords(:,2)-2;
 end
 
 % If the whisker already exists, update it. Otherwise, create new whisker.
@@ -80,7 +86,7 @@ else
     if nWind == 0, nWind = size(g_tWT.Colors,1); end
     hSpline = plot(vXX, vYY, '-', 'LineWidth', g_tWT.WhiskerWidth, ...
         'color', g_tWT.Colors(nWind, :), 'Tag', sprintf('whisker%d', w));
-    hScatHand = plot(vX, vY, 'k.', 'LineWidth', 10, 'Tag', sprintf('scatpt%d', w));
+    hScatHand = plot(vX, vY, 'x', 'color', g_tWT.Colors(nWind, :)/2, 'markersize', 5, 'Tag', sprintf('scatpt%d', w));
     
     if ~strcmp(sOption, 'nomenu')
         % Remove old menus if any are found

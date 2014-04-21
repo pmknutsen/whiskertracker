@@ -3,8 +3,8 @@ function wt
 % Start-up and initialize WT workspace
 %
 
-%    WhiskerTracker - Automated whiskertracking in Matlab
-%    Copyright (C) 2005-2013  Per M Knutsen <pmknutsen@gmail.com>
+%    WhiskerTracker - Automated Whisker Tracking in Matlab
+%    Copyright (C) 2005-2014  Per M Knutsen <pmknutsen@gmail.com>
 %
 %    This program is free software: you can redistribute it and/or modify
 %    it under the terms of the GNU General Public License as published by

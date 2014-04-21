@@ -5,6 +5,7 @@ function wt_set_status(sString)
 %
 % If the string contains the words 'warning' or 'error', the string is
 % briefly highlighted in red.
+%
 
 global g_tWT
 

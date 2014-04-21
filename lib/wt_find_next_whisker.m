@@ -17,7 +17,7 @@ persistent p_fQuadFun
 if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
-if g_tWT.ParallelMode && exist('matlabpool')
+if g_tWT.ParallelMode && exist('matlabpool', 'file')
     nPoolSize = matlabpool('size');
 else
     nPoolSize = 0;
@@ -44,22 +44,27 @@ if g_tWT.MovieInfo.UsePosExtrap % Position extrapolation matrix
     mVelMat = wt_extrapolate_position(g_tWT.MovieInfo.SplinePoints(:,:,nPrevFrame,nChWhisker), ...
         mImg, ...
         g_tWT.MovieInfo.SplinePoints(:, :, 1:nPrevFrame, nChWhisker) );
+
     if g_tWT.VerboseMode
         % Update/display debug window
         hFig = findobj('Tag', 'WT_DEBUG_EXTRAPOLATION_WINDOW');
         if isempty(hFig)
             hFig = figure;
             set(hFig, 'Tag', 'WT_DEBUG_EXTRAPOLATION_WINDOW', 'DoubleBuffer', 'on', ...
-                'Name', 'WT Debug - Velocity extrapolation', 'numbertitle', 'off')
-        else figure(hFig), end
+                'Name', ['WT Debug - ' mfilename], 'numbertitle', 'off', 'toolbar', 'none')
+        end
         colormap gray
-        subplot(1,3,1); imagesc(mImg);
+        hAx = subplot(1, 3, 1, 'parent', hFig);
+        imagesc(mImg, 'parent', hAx);
         title('Original')
-        subplot(1,3,2); imagesc(mVelMat);
-        title('VelocityMatrix')
-        subplot(1,3,3); imagesc(mImg.*mVelMat);
-        title('Original*VelocityMatrix')
+        subplot(1, 3, 2, 'parent', hFig);
+        imagesc(mVelMat, 'parent', hAx);
+        title(hAx, 'VelocityMatrix')
+        subplot(1, 3, 3, 'parent', hFig);
+        imagesc(mImg.*mVelMat, 'parent', hAx);
+        title(hAx, 'Original*VelocityMatrix')
     end
+    
 else
     mVelMat = ones(size(mImg));
 end
@@ -67,7 +72,7 @@ end
 % Get whisker spline of previous frame
 nPrevFrame = max([nPrevFrame 1]);
 mCurrSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nPrevFrame, nChWhisker));
-vRemRows = find(~sum(mCurrSpline'));
+vRemRows = find(~sum(mCurrSpline, 2)');
 mCurrSpline(vRemRows,:) = []; % Remove [0 0] rows
 
 % Select spline movement range
@@ -97,14 +102,13 @@ if size(mCurrSpline, 1) == 4
     if mCurrSpline(4, 1) == 0
         mCurrSpline(4, :) = [];
     else
-        mEnumRange = [mEnumRange(1,:);mEnumRange(2,:);mEnumRange(2,:);mEnumRange(3,:)];
+        mEnumRange = [mEnumRange(1,:); mEnumRange(2,:); mEnumRange(2,:); mEnumRange(3,:)];
     end
 end
 
 % Cell MEX routine
 if g_tWT.RepositionOnly
     % If we are only doing repositioning, grab already tracked location
-    %mNewSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nCurFrame, nChWhisker));
     mNewSpline = round(mCurrSpline);
     nScore = 2;
     nScoreStd = 0;
@@ -165,7 +169,7 @@ else
             end
         end
     end
-    g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:,nCurFrame,nChWhisker) = mNewSpline;
+    g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:, nCurFrame, nChWhisker) = mNewSpline;
 end
 
 % Add [0 0] rows removed earlier
@@ -210,6 +214,7 @@ end
 
 return
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Wrapper functions for optimizing whisker placement
 
 % Non-parallel processing version

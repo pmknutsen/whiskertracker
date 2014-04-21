@@ -11,10 +11,10 @@ else g_tWT.ShowLabelIdentity = ~g_tWT.ShowLabelIdentity; end
 % Update user-menu
 switch g_tWT.ShowLabelIdentity
     case 0
-        sStatus = 'off';        
+        sStatus = 'off';
         set(gcbo, 'checked', 'off')
     case 1
-        sStatus = 'on';        
+        sStatus = 'on';
         set(gcbo, 'checked', 'on')
     otherwise
         g_tWT.ShowLabelIdentity = 0;
