@@ -1,30 +1,33 @@
 % wt_compile
 % Compile WhiskerTracker C code as native and platform specific MEX file
 %
-% Note that this file may not run as-is. It has been written and found to compile
-% the code successfully on 32 and 64 bit Linux and Windows machines. Modifications
-% may be required for other platforms
+% Require that a compiler is locally installed and configured.
+% Use 'mex -setup' to configure your environment properly.
+%
 %
 
 clc
 disp('******* Compiling WhiskerTracker from C source *******')
-
-%clear find_next_whisker
-%clear rotate_matrix
+disp('If any warnings are reported, it is strongly advices you correct these.');
 
 % Get path to ./bin/ directory
 sDir = which(mfilename);
 sDir = sDir(1:(end-length(mfilename)-6));
 
-%sDir(findstr(sDir, ' ')) = '\';
-
+% Perform platform specific compilation
 if isunix
     % Compile for Linux
     sTargetDir = [sDir 'linux'];
     
+    % Compile find_next_whisker.c
     eval(['mex find_next_whisker.c mex_utils.c matrix2d.c spline.c -outdir ''' sTargetDir ''''])
-    %mex -inline rotate_matrix.c matrix2d.c
+    
+    % Compile rotate_matrix.c
+    eval(['mex rotate_matrix.c matrix2d.c -outdir ''' sTargetDir ''''])
 
+    % Remove .o files
+    delete([sTargetDir filesep '*.o']);
+    
 elseif ispc
     % Compile for Windows
     sTargetDir = [sDir 'windows'];

@@ -17,7 +17,7 @@
 
 #define round(X) (floor(X+0.5))
 #define sqr(X) ((X)*(X)))
-#define PI 3.14159
+/*#define PI 3.14159*/
 #define RAD_TO_DEG(x) ((x)/PI*180)
 #define DEG_TO_RAD(x) ((x)/180*PI)
 

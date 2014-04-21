@@ -18,7 +18,7 @@ void spline(float x[],float y[],float y2[],int npoints)
   float p,qn,sig,un;
   float *u; 
   
-  u = allocate_ivector(1,npoints);
+  u = allocate_ivector(1, npoints);
 
   y2[1] = u[1] = 0.0; /* this defines a natural spline */
   y2[npoints] = 0.0;
