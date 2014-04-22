@@ -13,6 +13,8 @@ end
 
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
 
+g_tWT.RepositionOnly = 0;
+
 % Options
 sOptions = [];
 if nargin == 2, sOptions = varargin{2}; end
@@ -123,16 +125,7 @@ for nFrame = vDoFrames(1):g_tWT.MovieInfo.NoFramesToLoad:vDoFrames(end)
         end
         
         % Locate next whisker
-        %if (nFirstFrame == 1)
-        %    nPreviousFrame = 1;
-        %elseif (nCurrentFrame == nFirstFrame)
-        %    nPreviousFrame = nFirstFrame;
-        %else
-        %    nPreviousFrame = nCurrentFrame - 1;
-        %end
         nPreviousFrame = max([nCurrentFrame - 1 1]);
-        
-        [nPreviousFrame nCurrentFrame]
         [nScore, nScoreStd, ~] = wt_find_next_whisker(nChWhisker, nCurrentFrame, nPreviousFrame, mImg, 'fast');
         
         % Refresh display

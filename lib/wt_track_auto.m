@@ -8,7 +8,9 @@ g_tWT.StopProc=0;
 
 sMethod = 'nearest'; % method of interpolation during image rotation
 
-if ~isfield(g_tWT, 'RepositionOnly') g_tWT.RepositionOnly = 0; end
+if ~isfield(g_tWT, 'RepositionOnly')
+    g_tWT.RepositionOnly = 0;
+end
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
 
 % Start matlabpool if not open already
@@ -111,7 +113,7 @@ for nStepRange = vTrackFrames
             end
             
             % Pre-process (crop, rotate & invert)
-            [mFrame, VOID] = wt_image_preprocess(mFrame);
+            [mFrame, ~] = wt_image_preprocess(mFrame);
 
             % Crop frame according to head-position
             if ~isnan(g_tWT.MovieInfo.RightEye(nRealFrameNumber,1)) && ~isnan(g_tWT.MovieInfo.LeftEye(nRealFrameNumber,1))
@@ -124,26 +126,34 @@ for nStepRange = vTrackFrames
             
             % Join two images
             mImgCroppedOnly = cat(2, mImg{1}, mImg{2});
-
         else
             % Movie with no head-movements
-            try [mImg, mImgCroppedOnly] = wt_image_preprocess(mFrame);
-            catch, wt_error('Failed pre-processing image. Try Debug.'); end
+            try
+                [mImg, mImgCroppedOnly] = wt_image_preprocess(mFrame);
+            catch meException
+                wt_error('Failed pre-processing image. Try Debug.');
+            end
         end
 
         % Process whisker-by-whisker
         for w = 1:size(g_tWT.MovieInfo.SplinePoints, 4)
 
             % Skip whisker if its position in PREVIOUS frame is unknown
-            if nRealFrameNumber-1 > 0, if ~any(g_tWT.MovieInfo.SplinePoints(:,1,nRealFrameNumber-1,w)), continue, end, end
+            if nRealFrameNumber-1 > 0
+                if ~any(g_tWT.MovieInfo.SplinePoints(:,1,nRealFrameNumber-1,w))
+                    continue
+                end
+            end
             
             % Skip whisker if its last frame has been reached
-            if nRealFrameNumber > g_tWT.MovieInfo.LastFrame(w), continue, end
+            if nRealFrameNumber > g_tWT.MovieInfo.LastFrame(w)
+                continue
+            end
             
             % Skip whisker if its position is known in CURRENT frame,
             % unless we are repositioning
             if ~(nRealFrameNumber > size(g_tWT.MovieInfo.SplinePoints, 3))
-                if any(g_tWT.MovieInfo.SplinePoints(:,1,nRealFrameNumber,w)) & ~g_tWT.RepositionOnly
+                if any(g_tWT.MovieInfo.SplinePoints(:,1,nRealFrameNumber,w)) && ~g_tWT.RepositionOnly
                     continue;
                 end
             end
@@ -165,21 +175,21 @@ for nStepRange = vTrackFrames
                 wt_display_frame(nRealFrameNumber, mImgCroppedOnly);
                 break
             end
-            
         end % end of whisker loop
 
         if g_tWT.StopProc, break, end
-        
+
         % Plot whisker
         if counter == g_tWT.MovieInfo.ScreenRefresh
             wt_display_frame(nRealFrameNumber, mImgCroppedOnly);
             counter = 1;
-        else counter = counter + 1; end
+        else
+            counter = counter + 1;
+        end
 
     end % end of current range loop (all loaded frames)
         
     if g_tWT.StopProc, break, end
-    
 end
 
 % Enable 'play' buttons

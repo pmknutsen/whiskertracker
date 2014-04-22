@@ -13,11 +13,11 @@ global g_tWT
 g_tWT.RepositionOnly = 1;
 
 try
-    wt_set_status('Repositioning whisker(s)')
+    wt_set_status('Repositioning whisker(s)...')
     wt_track_auto('auto')
     g_tWT.RepositionOnly = 0;
     wt_set_status('Repositioning of whisker(s) completed')
-catch
+catch meException
     wt_set_status('Warning: Repositioning of whisker(s) failed')
     g_tWT.RepositionOnly = 0;
 end

@@ -64,14 +64,17 @@ if g_tWT.MovieInfo.UsePosExtrap % Position extrapolation matrix
         imagesc(mImg.*mVelMat, 'parent', hAx);
         title(hAx, 'Original*VelocityMatrix')
     end
-    
 else
     mVelMat = ones(size(mImg));
 end
 
 % Get whisker spline of previous frame
 nPrevFrame = max([nPrevFrame 1]);
-mCurrSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nPrevFrame, nChWhisker));
+if g_tWT.RepositionOnly
+    mCurrSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nCurFrame, nChWhisker));
+else
+    mCurrSpline = round(g_tWT.MovieInfo.SplinePoints(:, :, nPrevFrame, nChWhisker));
+end
 vRemRows = find(~sum(mCurrSpline, 2)');
 mCurrSpline(vRemRows,:) = []; % Remove [0 0] rows
 
@@ -134,8 +137,10 @@ if nScore == 0
     wt_set_status('Warning: Cannot discern whisker from background. Using coordinates of previous frame.')
 else
     % Improve tracking accuracy by interpolating position of individual points along the
-    % whisker spline to a better estimated location of whisker center.
-    % Note: This refinement takes a bit hit on performance.
+    % whisker spline to a better estimate true location center of whisker shaft. 
+    %
+    % Note: This refinement takes a big hit on performance.
+    %
     if g_tWT.RepositionOnly
         nProfileRad = g_tWT.MovieInfo.WhiskerWidth * 2;
         if g_tWT.MovieInfo.nTrackAccAdj > 0
@@ -152,15 +157,27 @@ else
             [vXi, vYi] = wt_spline(mNewSpline(:,1), mNewSpline(:,2), vXX(vIndx));
             mAdjustPoints = [vXi' vYi'];
             
-            if nPoolSize > 1 % run parallel version (parfor loop)
+            if nPoolSize > 1 && ~g_tWT.VerboseMode % run parallel version (parfor loop), except in Debug mode
                 mFullSpline = OptimizeWhiskerPlacementPar(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
-            else % run non-parellel code (for loop)
+            else % run non-parallel code (regular for loop)
                 mFullSpline = OptimizeWhiskerPlacement(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions);
             end
             
-            [vX, vY] = wt_spline(mFullSpline(:,1), mFullSpline(:,2), mNewSpline(:,1));
+            % Check optimization result; if signal/noise is worse than
+            % original tracking then discard optimization
+            nOld = mean(mImg(round(sub2ind(size(mImg), mAdjustPoints(:,1), mAdjustPoints(:, 2)))));
+            nNew = mean(mImg(round(sub2ind(size(mImg), mFullSpline(:,1), mFullSpline(:, 2)))));
+            iAbout = [round(sub2ind(size(mImg), mAdjustPoints(:,1), mAdjustPoints(:, 2)-2));
+                round(sub2ind(size(mImg), mAdjustPoints(:,1), mAdjustPoints(:, 2)+2))];
+            nAbout = mean(mImg(iAbout));
+            if (nOld/nAbout) <= (nNew/nAbout)
+                mFullSpline = mAdjustPoints;
+                wt_set_status('Warning: Optimization is poor. Result discarded.')
+            end
+            
+            %%[vX, vY] = wt_spline(mFullSpline(:,1), mFullSpline(:,2), mNewSpline(:,1));
             if size(mFullSpline, 1) > 3
-                [vP] = polyfit(mFullSpline(:,1), mFullSpline(:,2), 3);
+                vP = polyfit(mFullSpline(:,1), mFullSpline(:,2), 3); % faster than wt_spline
                 vX = mNewSpline(:,1);
                 vY = vP(1).*vX.^3 + vP(2).*vX.^2 + vP(3).*vX + vP(4);
                 mNewSpline = [vX vY];
@@ -169,7 +186,7 @@ else
             end
         end
     end
-    g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1),:, nCurFrame, nChWhisker) = mNewSpline;
+    g_tWT.MovieInfo.SplinePoints(1:size(mNewSpline,1), :, nCurFrame, nChWhisker) = mNewSpline;
 end
 
 % Add [0 0] rows removed earlier
@@ -219,10 +236,24 @@ return
 
 % Non-parallel processing version
 function mFullSpline = OptimizeWhiskerPlacement(g_tWT, p_fQuadFun, mAdjustPoints, nProfileRad, mImg, sFitFun, tOptions)
+if g_tWT.VerboseMode
+    hFig = findobj('Tag', 'TRACK_REPOSITION');
+    if isempty(hFig)
+        hFig = figure;
+        set(hFig, 'Tag', 'TRACK_REPOSITION', 'DoubleBuffer', 'on', 'toolbar', 'none', ...
+            'Name', ['WT Debug - ' mfilename], 'numbertitle', 'off', 'position', [1 1 300 300])
+        centerfig(hFig)
+        hAx = subplot(1, 1, 1, 'parent', hFig);
+    else
+        hAx = findobj(hFig, 'type', 'axes');
+        hold(hAx, 'off')
+    end
+end
+
 mFullSpline = [];
 warning('off', 'stats:nlinfit:IterationLimitExceeded')
 warning('off', 'stats:nlinfit:IllConditionedJacobian')
-for i = 1:size(mAdjustPoints, 1) % note use of parfor
+for i = 1:size(mAdjustPoints, 1)
     vXY = round(mAdjustPoints(i, :));
     % Get profile of whisker shaft
     vX = (vXY(2)-nProfileRad):(vXY(2)+nProfileRad);
@@ -230,7 +261,7 @@ for i = 1:size(mAdjustPoints, 1) % note use of parfor
     % of the frame
     if ~(any(vX < 1) || any(vX > size(mImg, 1)))
         vY = mImg(vX, vXY(1));
-        vY = (vY-min(vY))/max(vY-min(vY));
+        vY = (vY-min(vY)) / max(vY-min(vY));
         vXXi = linspace(min(vX), max(vX), 200);
         vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
         
@@ -242,11 +273,18 @@ for i = 1:size(mAdjustPoints, 1) % note use of parfor
         end
         
         vYYi = p_fQuadFun(vB, vXXi);
-        [nMin nMinIndx] = min(vYYi);
+        [~, nMinIndx] = min(vYYi);
         mFullSpline(i, :) = [vXY(1) vXXi(nMinIndx)];
+        
+        if g_tWT.VerboseMode
+            vCol = rand(1, 3);
+            plot(hAx, vXXi, vYYi, '-', 'color', vCol)
+            hold(hAx, 'on')
+            plot(hAx, vX, vY, 'o', 'color', vCol)
+            drawnow
+        end
     end
 end
-
 return
 
 % Parallel processing version (parfor loop)
@@ -262,7 +300,7 @@ parfor i = 1:size(mAdjustPoints, 1) % note use of parfor
     % of the frame
     if ~(any(vX < 1) || any(vX > size(mImg, 1)))
         vY = mImg(vX, vXY(1));
-        vY = (vY-min(vY))/max(vY-min(vY));
+        vY = (vY-min(vY)) / max(vY-min(vY));
         vXXi = linspace(min(vX), max(vX), 200);
         vInitParms = [vX(nProfileRad+1) g_tWT.MovieInfo.WhiskerWidth/2];
 

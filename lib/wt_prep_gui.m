@@ -53,10 +53,10 @@ uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_Rota
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_RotateClockwise', 'TooltipString', 'Flip Vertically', 'ClickedCallback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')']);
 
 [mCData, mCM] = imread([sPath 'right.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking SLOW
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''slow'')'], 'separator', 'on');
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track SLOW', 'ClickedCallback', ['global g_tWT;g_tWT.RepositionOnly=0;g_tWT.StopProc=0;wt_track_auto(''slow'')'], 'separator', 'on');
 
 [mCData, mCM] = imread([sPath 'right_double.gif']); mCData = ind2rgb(mCData, mCM); mCData(mCData == 1) = NaN; % Start tracking FAST
-uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track FAST', 'ClickedCallback', ['global g_tWT;g_tWT.StopProc=0;wt_track_auto(''fast'')']);
+uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_PanRight', 'TooltipString', 'Track FAST', 'ClickedCallback', ['global g_tWT;g_tWT.RepositionOnly=0;g_tWT.StopProc=0;wt_track_auto(''fast'')']);
 
 mCData = im2double(imread([sPath 'cancel.png'])); mCData(mCData == 0) = NaN;
 uipushtool('Parent', hToolbar, 'cdata', mCData, 'Tag', 'Spiky_WaitbarAction_CancelTracking', 'TooltipString', 'Cancel Tracking', 'ClickedCallback', ['global g_tWT; g_tWT.StopProc = 1;']);
@@ -100,9 +100,9 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Delete...', 'Parent', hWhiskers, 'Callback', 'wt_clear_selected_whisker');
     uimenu(hFrameWin, 'Label','Delete All', 'Parent', hWhiskers, 'Callback', ['wt_clear_whisker(''all''); wt_batch_redo(''wt_clear_whisker(''''all'''')'')'], 'checked', 'on');
 
-    uimenu(hFrameWin, 'Label','Track - Slow', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on', 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Track - Fast', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Auto Select Speed', 'Parent', hWhiskers, 'Callback', ['wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Track - Slow', 'Parent', hWhiskers, 'Callback', ['global g_tWT;g_tWT.RepositionOnly=0;wt_track_auto(''slow'');wt_batch_redo(''wt_track_auto(''''slow'''')'');'], 'Separator', 'on', 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Track - Fast', 'Parent', hWhiskers, 'Callback', ['global g_tWT;g_tWT.RepositionOnly=0;wt_track_auto(''fast'');wt_batch_redo(''wt_track_auto(''''fast'''')'');'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Auto Select Speed', 'Parent', hWhiskers, 'Callback', ['global g_tWT;g_tWT.RepositionOnly=0;wt_track_auto(''auto'');wt_batch_redo(''wt_track_auto(''''auto'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', 'wt_set_tracking_range()');
     uimenu(hFrameWin, 'Label','Reposition Whiskers', 'Parent', hWhiskers, 'Callback', ['wt_repositioning();wt_batch_redo(''wt_repositioning()'');'], 'checked', 'on');
     
