@@ -5,6 +5,9 @@ function wt_prep_gui
 
 global g_tWT
 
+% Force batch mode exit
+g_tWT.BatchMode = 0;
+
 hFrameWin = findobj('Tag', 'WTMainWindow');
 set(hFrameWin, 'color', [.8 .8 .8])
 
@@ -122,8 +125,8 @@ if ~isempty(g_tWT.Movies)
         
     % Head related menu items
     hHead = uimenu(hFrameWin, 'Label', 'Head');
-    uimenu(hFrameWin, 'Label','Track Head', 'Parent', hHead, 'Callback', ['wt_init_head_tracker']);
-    uimenu(hFrameWin, 'Label','Set Head Position...', 'Parent', hHead, 'Callback', ['wt_init_head_tracker(''static_head'')']);
+    uimenu(hFrameWin, 'Label','Track Head', 'Parent', hHead, 'Callback', ['wt_init_head_tracker;  wt_batch_redo(''wt_init_head_tracker'');'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Set Head Position...', 'Parent', hHead, 'Callback', ['wt_init_head_tracker(''static_head''); wt_batch_redo(''wt_init_head_tracker(''''static_head'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Configure Eye Filter...', 'Parent', hHead, 'Callback', ['global g_tWT; g_tWT.EyeFilter=wt_create_filter(g_tWT.EyeFilter);'], 'separator', 'on');
     uimenu(hFrameWin, 'Label','Clean Head Movements', 'Parent', hHead, 'Callback', ['wt_clean_splines(0)']);    
     uimenu(hFrameWin, 'Label','Reset Head Tracking', 'Parent', hHead, 'Callback', ['global g_tWT;g_tWT.MovieInfo.RightEye=[];g_tWT.MovieInfo.LeftEye=[];g_tWT.MovieInfo.Nose=[];g_tWT.MovieInfo.EyeNoseAxLen=[];wt_display_frame;']);

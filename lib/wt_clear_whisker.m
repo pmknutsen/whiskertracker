@@ -2,11 +2,13 @@ function wt_clear_whisker(vChWhiskers, vFrames)
 % WT_CLEAR_WHISKER
 % Delete all or parts of tracked data of selected whiskers, or delete all
 % tracked whiskers.
+% 
+% Usage:
+%   wt_clear_whisker(1)         Delete whisker with index 1
+%   wt_clear_whisker([2 3])       Delete whiskers with indices 2 and 3
+%   wt_clear_whisker('all')     Delete all whiskers
+%   wt_clear_whisker(1, 50:80)  Delete frames 50 to 80 of whisker 1
 %
-% Syntax:   wt_clear_whisker(1)         Delete whisker with index 1
-%           wt_clear_whisker([2 3])       Delete whiskers with indices 2 and 3
-%           wt_clear_whisker('all')     Delete all whiskers
-%           wt_clear_whisker(1, 50:80)  Delete frames 50 to 80 of whisker 1
 
 global g_tWT
 

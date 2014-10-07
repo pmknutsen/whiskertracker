@@ -186,6 +186,9 @@ else
             nCurrentFrame = get(g_tWT.Handles.hSlider, 'Value');
             hFrameMarker = plot([nCurrentFrame nCurrentFrame].*(1000/nFS), [-.5 1.5], 'r:');
             set(hFrameMarker, 'Tag', 'framemarker')
+            if ~exist('nMovDur', 'var')
+                nMovDur = 10;
+            end
             set(hLeftPanel, 'ylim', [0 1], ...
                 'ytick', [], ...
                 'xlim', [1 nMovDur], ...
