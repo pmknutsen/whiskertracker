@@ -216,13 +216,13 @@ if sum(g_tWT.MovieInfo.MidPointConstr(:,nChWhisker)) ~= 0
         wt_error('Failed with wt_spline');
     end
     if (nMidPoint <= nMin) % Min limit
-        nNewX = max([(nMin + g_tWT.MovieInfo.RadJitter) min(vXX)]);
+        nNewX = round(max([(nMin + g_tWT.MovieInfo.RadJitter) min(vXX)]));
         g_tWT.MovieInfo.SplinePoints(2, 1, nCurFrame, nChWhisker) = nNewX;
         vNewYIndx = find(vXX == nNewX);
         g_tWT.MovieInfo.SplinePoints(2, 2, nCurFrame, nChWhisker) = vYY(vNewYIndx(1));
     end
     if (nMidPoint >= nMax) % Max limit
-        nNewX = min([(nMax - g_tWT.MovieInfo.RadJitter) max(vXX)]);
+        nNewX = round(min([(nMax - g_tWT.MovieInfo.RadJitter) max(vXX)]));
         g_tWT.MovieInfo.SplinePoints(2, 1, nCurFrame, nChWhisker) = nNewX;
         vNewYIndx = find(vXX == nNewX);
         g_tWT.MovieInfo.SplinePoints(2, 2, nCurFrame, nChWhisker) = vYY(vNewYIndx(1));
