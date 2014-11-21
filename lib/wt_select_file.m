@@ -4,10 +4,16 @@ function sMovies = wt_select_file
 
 global g_tWT
 
-[sFilename, sFilepath] = uigetfile({'*.avi', 'AVI-files (*.avi)'; '*.mat', 'MAT-files (*.mat)';'*.*', 'All File (*.*)'}, 'Select file');
+cFormats = {...
+    '*.avi', 'AVI-files (*.avi)'; ...
+    '*.bin', 'Streamer files (*.bin)'; ...
+    '*.mat', 'MAT-files (*.mat)'; ...
+    '*.*', 'All Files (*.*)' };
+
+[sFilename, sFilepath] = uigetfile(cFormats, 'Select file');
 
 % Return immeditaley if user cancelled this action
-if ~sFilename return; end
+if ~sFilename, return; end
 
 % Build list of files
 g_tWT.Movies = struct([]);
@@ -26,4 +32,4 @@ g_tWT.MovieInfo.Rot = 0;
 % Load movie and display first frame
 wt_load_movie(1);
 
-return;
+return

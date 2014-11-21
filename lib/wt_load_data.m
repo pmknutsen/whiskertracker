@@ -1,8 +1,7 @@
 function wt_load_data(varargin)
-% WT_LOAD_DATA Load movie data from disk.
+% WT_LOAD_DATA Load movie data from disk
 %
-% Usage:
-%   TODO
+% WT_LOAD_DATA()
 %
 
 
@@ -11,7 +10,10 @@ sOldMovieName = '';
 
 % Load whisker data and parameters
 try
-    vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.avi')-1;
+    vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.avi') - 1;
+    if isempty
+        vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.bin') - 1;
+    end
     sFilename = sprintf('%s.mat', g_tWT.MovieInfo.Filename(vStrIndx));
 
     % Let user select data file to load (otherwise load default)

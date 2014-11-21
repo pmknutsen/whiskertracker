@@ -1,12 +1,24 @@
 function mFrames = wt_load_avi(sFile, vFrames, varargin)
 % wt_load_avi
 % Load specified range of frames from an AVI movie
+% 
 % wt_load_avi(FILENAME, FRAMES, OPTION), where
 %  FILENAME is the path and name of the AVI file
 %  FRAMES   is a vector that contains framenumbers to be loaded
 %  OPTION   is an optional parameter, that can be:
 %     'none'      no option
 %     'noresize'  don't resize frames
+% 
+% If input file is a different format, such as .bin, this function will
+% detect that and call the correct reader function (eg. wt_load_bin).
+%
+
+% Process alternative file formats, eg. Streamer BIN files.
+sExt = sFile(end-2:end);
+if ~strcmpi(sExt, 'avi')
+    eval(sprintf('mFrames = wt_load_%s(sFile, vFrames);', sExt))
+    return
+end
 
 warning off MATLAB:mat2cell:ObsoleteSingleInput
 warning off MATLAB:audiovideo:aviread:FunctionToBeRemoved

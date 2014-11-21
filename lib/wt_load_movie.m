@@ -78,23 +78,38 @@ else
 end
 
 % Load info from video file (if it exists), UNLESS user selected a .mat file
-if ~strcmp(sFileName(end-3:end), '.mat')
+sExt = sFileName(end-2:end);
+if ~strcmp(sExt, 'mat')
     if exist(sFileName, 'file')
-        tMovieInfo = struct([]);
-        if exist('VideoReader')
-            clInfo = VideoReader(sFileName);
-        elseif exist('mmreader')
-            clInfo = mmreader(sFileName);
-        end
-        if exist('clInfo')
-            tMovieInfo(1).Filename = sFileName;
-            tMovieInfo(1).NumFrames = clInfo.NumberOfFrames;
-            tMovieInfo(1).FramesPerSecond = clInfo.FrameRate;
-            tMovieInfo(1).Width = clInfo.Width;
-            tMovieInfo(1).Height = clInfo.Height;
-            tMovieInfo(1).ImageType = clInfo.VideoFormat;
-        else
-            tMovieInfo = aviinfo(sFileName);
+        switch sExt
+            case 'avi'
+                % AVI files
+                tMovieInfo = struct([]);
+                if exist('VideoReader')
+                    clInfo = VideoReader(sFileName);
+                elseif exist('mmreader')
+                    clInfo = mmreader(sFileName);
+                end
+                if exist('clInfo')
+                    tMovieInfo(1).Filename = sFileName;
+                    tMovieInfo(1).NumFrames = clInfo.NumberOfFrames;
+                    tMovieInfo(1).FramesPerSecond = clInfo.FrameRate;
+                    tMovieInfo(1).Width = clInfo.Width;
+                    tMovieInfo(1).Height = clInfo.Height;
+                    tMovieInfo(1).ImageType = clInfo.VideoFormat;
+                else
+                    tMovieInfo = aviinfo(sFileName);
+                end
+            
+            case 'bin'
+                % Streamer files
+                [~, tInfo] = wt_readstreamer(sFileName, 1);
+                tMovieInfo(1).Filename = sFileName;
+                tMovieInfo(1).NumFrames = tInfo.nNumFrames;
+                tMovieInfo(1).FramesPerSecond = tInfo.nFPS;
+                tMovieInfo(1).Width = tInfo.vResolution(1);
+                tMovieInfo(1).Height = tInfo.vResolution(2);
+                tMovieInfo(1).ImageType = tInfo.sType;
         end
         g_tWT.MovieInfo = tMovieInfo;
     else
