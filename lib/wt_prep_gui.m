@@ -109,20 +109,20 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Set Tracking Range', 'Parent', hWhiskers, 'Callback', 'wt_set_tracking_range()');
     uimenu(hFrameWin, 'Label','Reposition Whiskers', 'Parent', hWhiskers, 'Callback', ['wt_repositioning();wt_batch_redo(''wt_repositioning()'');'], 'checked', 'on');
     
-    % Whisker labels
-    hLabels = uimenu(hFrameWin, 'Label', 'Whisker Labels', 'Parent', hWhiskers, 'Separator', 'on');
-    uimenu(hFrameWin, 'Label','Track Labels', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Label Filter...', 'Parent', hLabels, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
-    uimenu(hFrameWin, 'Label','Mark Whisker and Label...', 'Parent', hLabels, 'Callback', ['wt_mark_whisker_and_label;']);
-    uimenu(hFrameWin, 'Label','Clear Labels', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Extend Whiskers', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Label Names', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity')
-
     uimenu(hFrameWin, 'Label','Set Last Frame...', 'Parent', hWhiskers, 'Callback', 'wt_set_last_frame', 'Separator', 'on');
     uimenu(hFrameWin, 'Label', 'Whisker Display Width...', 'Parent', hWhiskers, 'Callback', 'wt_change_whisker_width')
     uimenu(hFrameWin, 'Label', 'Show Whisker Identities', 'Parent', hWhiskers, 'Callback', 'wt_toggle_show_identity')
     uimenu(hFrameWin, 'Label', 'Hide Whiskers', 'Parent', hWhiskers, 'Callback', 'wt_toggle_whisker_visibility')
         
+    % Track markers menu
+    hLabels = uimenu(hFrameWin, 'Label', 'Markers');
+    uimenu(hFrameWin, 'Label','New Marker...', 'Parent', hLabels, 'Callback', ['wt_mark_whisker_and_label;'], 'accelerator', 'M');
+    uimenu(hFrameWin, 'Label','Track Markers', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Marker Filter...', 'Parent', hLabels, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
+    uimenu(hFrameWin, 'Label','Clear', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Extend As Whiskers', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Marker Names', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity')
+    
     % Head related menu items
     hHead = uimenu(hFrameWin, 'Label', 'Head');
     uimenu(hFrameWin, 'Label','Track Head', 'Parent', hHead, 'Callback', ['wt_init_head_tracker;  wt_batch_redo(''wt_init_head_tracker'');'], 'checked', 'on');
@@ -214,7 +214,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Use Parallel Processing', 'Parent', hOptions, 'Callback', 'wt_toggle_parallel', 'checked', 'on');
     uimenu(hFrameWin, 'Label','Compress Datafiles', 'Parent', hOptions, 'Callback', 'wt_toggle_datacompress', 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Uncompress Movie', 'Parent', hOptions, 'Callback', 'wt_uncompress_movie');
-    uimenu(hFrameWin, 'Label','Play Movie', 'Parent', hOptions, 'Callback', 'wt_play_movie', 'Separator', 'on', 'accelerator', 'M');
+    uimenu(hFrameWin, 'Label','Play Movie', 'Parent', hOptions, 'Callback', 'wt_play_movie', 'Separator', 'on');
     uimenu(hFrameWin, 'Label','Movie Preview', 'Parent', hOptions, 'Callback', ['wt_play_movie(''preview''); wt_batch_redo(''wt_play_movie(''''preview'''')'');'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Save Movie', 'Parent', hOptions, 'Callback', 'wt_play_movie(''save'')');
     uimenu(hFrameWin, 'Label','Dump Screen...', 'Parent', hOptions, 'Callback', 'wt_dump_screen', 'Separator', 'on');

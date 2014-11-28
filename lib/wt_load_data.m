@@ -4,14 +4,13 @@ function wt_load_data(varargin)
 % WT_LOAD_DATA()
 %
 
-
 global g_tWT
 sOldMovieName = '';
 
 % Load whisker data and parameters
 try
     vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.avi') - 1;
-    if isempty
+    if isempty(vStrIndx)
         vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.bin') - 1;
     end
     sFilename = sprintf('%s.mat', g_tWT.MovieInfo.Filename(vStrIndx));
@@ -73,8 +72,10 @@ end
 
 % If the path of the video in g_tWT.MovieInfo is not the same as the
 % selected/loaded movie, then change the path in g_tWT.MovieInfo *by default*
-if ~strcmp(g_tWT.MovieInfo.Filename, [sFilename(1:end-3) 'avi']) % filenames don't match
-    g_tWT.MovieInfo.Filename = [sFilename(1:end-3) 'avi'];
+sTargetPath = fileparts(sFilename);
+[sLoadPath, sLoadFile, sLoadExt] = fileparts(g_tWT.MovieInfo.Filename);
+if ~strcmp(sTargetPath, sLoadPath)
+    g_tWT.MovieInfo.Filename = fullfile(sTargetPath, [sLoadFile sLoadExt]);
 end
 
 % Refresh frame

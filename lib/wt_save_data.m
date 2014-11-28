@@ -22,6 +22,9 @@ if ~isfield(g_tWT, 'DefaultSavePath'), return; end
 
 if isempty(g_tWT.DefaultSavePath)
     vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.avi')-1;
+    if isempty(vStrIndx)
+        vStrIndx = 1:findstr(g_tWT.MovieInfo.Filename, '.bin')-1;
+    end
     g_tWT.DefaultSavePath = sprintf('%s.mat', g_tWT.MovieInfo.Filename(vStrIndx));
 end
 
@@ -137,5 +140,4 @@ catch
     wt_error(lasterr)
 end
 
-
-return;
+return
