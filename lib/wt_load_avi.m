@@ -12,10 +12,23 @@ function mFrames = wt_load_avi(sFile, vFrames, varargin)
 % If input file is a different format, such as .bin, this function will
 % detect that and call the correct reader function (eg. wt_load_bin).
 %
+global g_tWT
+
+% Get full filename
+% If extension is missing, assume this is an AVI file
+[sPath, sFilename, sExt] = fileparts(sFile);
+if isempty(sExt)
+    sExt = '.avi';
+    sFile = fullfile(sPath, [sFilename sExt]);
+end
+
+% Check that file exists
+if ~exist(sFile, 'file')
+    wt_error(sprintf('The file %s does not exist', sFile))
+end
 
 % Process alternative file formats, eg. Streamer BIN files.
-sExt = sFile(end-2:end);
-if ~strcmpi(sExt, 'avi')
+if ~strcmpi(sExt, '.avi')
     eval(sprintf('mFrames = wt_load_%s(sFile, vFrames);', sExt))
     return
 end
@@ -33,7 +46,7 @@ end
 if exist('VideoReader')
     sVidReader = 'VideoReader';
     bNewVidReader = 1;
-elseif exist('mmreader')
+elseif exist('mmreader', 'file')
     sVidReader = 'mmreader';
     bNewVidReader = 1;
 else
@@ -79,7 +92,7 @@ try
         p_bDidAviReadCheck = 1;
     end
     
-    if (((bNewVidReader && length(vFrames) > 10) && ~ispc) || ~exist('aviread')) || p_bForceNewReader
+    if (((bNewVidReader && length(vFrames) > 10) && ~ispc) || ~exist('aviread', 'file')) || p_bForceNewReader
         tMov = eval([sVidReader '(sFile)']);
         nNumberOfFrames = tMov.NumberOfFrames;
         nHeight = tMov.Height;
@@ -104,7 +117,6 @@ try
                 if length(tFrames) > 2
                     tFrames(k).cdata = tFrames(k-1).cdata;
                 else
-                    global g_tWT;
                     tFrames(k).cdata = g_tWT.CurrentFrameBuffer.Img;
                 end
             end

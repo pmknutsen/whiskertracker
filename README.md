@@ -6,6 +6,8 @@ Multiple tracking modes are supported through a graphical user interface with a 
 
 Increase tracking speeds significantly by batch processing simultaneously with multiple WhiskerTracker instances running on different computers and CPU cores.
 
+See screenshots below.
+
 ###Features
 * Cross-platform (Windows and Linux)
 * Simple graphical user interface
@@ -43,9 +45,12 @@ Source code is included for the impatient and adventurous that would like to por
 
 Note that many features of the application does not depend on the compiled parts of the code and will run on any operating system.
 
-###Report bugs
-Please report errors, bugs and feature requests using the Issues tracker:
-https://github.com/pmknutsen/whiskertracker/issues.
+###Documentation
+https://github.com/pmknutsen/whiskertracker/wiki
+
+###Bugs & Suggestions
+If you experience bugs or have suggestions for improvements, please use the issue tracker:
+https://github.com/pmknutsen/whiskertracker/issues
 
 ###Reference
 Please cite the following reference in any publication using this work:
