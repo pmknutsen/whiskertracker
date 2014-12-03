@@ -30,9 +30,8 @@ See screenshots below.
 * Label head in 3 locations and track head movements.
 
 ###Screenshots
-<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/WhiskerTracking.png" alt="Whisker tracking" height="250"/>
-<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/HeadTracking.png" alt="Head tracking" height="250"/>
-<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/LimbTracking.png" alt="Limb tracking" height="250"/>
+<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/HeadTracking.png" alt="Head tracking" height="300"/>
+<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/LimbTracking.png" alt="Limb tracking" height="300"/>
 
 ###System Requirements
 * Matlab 2012b or higher recommended (will also run on 6.1 or higher)
