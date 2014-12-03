@@ -48,7 +48,7 @@ for i = 1:size(g_tWT.MovieInfo.WhiskerLabels{w}, 3) % iterate over labels
         hObjectMenu(w) = uicontextmenu; % context menu
         set(hObjectMenu(w), 'Tag', sprintf('%s_menu', sTag))
         vCol = g_tWT.Colors(w_this,:) + .4;
-        vCol(find(vCol>1)) = 1;
+        vCol(vCol > 1) = 1;
         hObj = plot(g_tWT.FrameAx, nX, nY, ...
             'color', vCol, ...
             'Marker', '+', 'Markersize', 8, ...
@@ -69,13 +69,29 @@ end
 
 % Show whisker name next to label
 if g_tWT.ShowLabelIdentity && isfield(g_tWT.MovieInfo, 'WhiskerIdentity')
+    % Remove old labels
     sIdent = '';
     if length(g_tWT.MovieInfo.WhiskerIdentity) >= w
         sIdent = g_tWT.MovieInfo.WhiskerIdentity{w};
         if isempty(sIdent), sIdent = ''; end
     end
-    hTxt = text(nX-15, nY-15, sIdent, 'fontsize', 10, 'color', g_tWT.Colors(w_this,:), 'FontWeight', 'bold');
-    set(hTxt, 'interpreter', 'none');
+    if iscell(sIdent)
+        sIdent = sIdent{1};
+    end
+    
+    % Get handle of previously drawn text label
+    hTxt = findobj(g_tWT.FrameAx, 'Tag', ['WTMarker_' sIdent]);
+    if length(hTxt) > 2
+        delete(hTxt)
+        hTxt = [];
+    end
+    if isempty(hTxt)
+        hTxt = text(nX-15, nY-15, sIdent, 'fontsize', 10, 'color', g_tWT.Colors(w_this,:), ...
+            'FontWeight', 'bold', 'Tag', ['WTMarker_' sIdent], ...
+            'parent', g_tWT.FrameAx, 'interpreter', 'none');
+    else
+        set(hTxt, 'position', [nX-15 nY-15 0])
+    end
 end
 
 return

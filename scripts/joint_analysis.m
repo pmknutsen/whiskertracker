@@ -24,11 +24,19 @@ mD = cMarkers{iD}; % [x y]
 %% Plot joint movements
 hFig = figure;
 hAx = subplot(2, 2, 1);
+
+%%
 hold(hAx, 'on')
-plot(hAx, mS(:,1), mS(:,2), 'k')
-plot(hAx, mE(:,1), mE(:,2), 'k')
-plot(hAx, mW(:,1), mW(:,2), 'k')
-plot(hAx, mD(:,1), mD(:,2), 'k')
+
+% Get frames with largest deviations from mean
+vD = mD(:,1);
+vD = vD - mean(vD);
+iF = abs(vD) > (std(vD));
+
+plot(hAx, mS(iF,1), mS(iF,2), 'k')
+plot(hAx, mE(iF,1), mE(iF,2), 'k')
+plot(hAx, mW(iF,1), mW(iF,2), 'k')
+plot(hAx, mD(iF,1), mD(iF,2), 'k')
 
 plot(hAx, [mean(mS(:,1)) mean(mE(:,1))], [mean(mS(:,2)) mean(mE(:,2))], 'b.-', 'markersize', 20)
 plot(hAx, [mean(mE(:,1)) mean(mW(:,1))], [mean(mE(:,2)) mean(mW(:,2))], 'r.-', 'markersize', 20)

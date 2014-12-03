@@ -1,6 +1,6 @@
 ###WhiskerTracker
 
-WhiskerTracker is a Matlab based application for tracking head and whisker movements in high-speed movies of freely moving or restrained rodents. 
+WhiskerTracker is a Matlab based application for tracking head, whisker and limb movements in high-speed movies of freely moving or restrained rodents. 
 
 Multiple tracking modes are supported through a graphical user interface with a small screen footprint. Choose from many pre-processing routines to track any high-speed movie automatically. Manual error correction is built-in.
 
@@ -11,7 +11,9 @@ Increase tracking speeds significantly by batch processing simultaneously with m
 * Simple graphical user interface
 * Automated and manual tracking
 * Many tracking modes
-* Track movements of freely-moving or restrained rodents
+    * Track whisker shafts in a 2D view
+    * Track head, whisker and limb movements in 'labeled dot' mode
+* Track in freely-moving or restrained rodents
 * High sensitivity (sub-degree movements)
 * Data analysis tools
 * Pre-processing options (transformations, ROI, background subtraction etc)
@@ -20,19 +22,21 @@ Increase tracking speeds significantly by batch processing simultaneously with m
 * Batch processing
 * Multithreaded (requires the Parallel Processing Toolbox)
 
+###Usage examples
+* Track the entire shaft of unlabeled whiskers/vibrissae
+* Label joints to track movements and rotations fore- and hindlimbs
+* Label head in 3 locations and track head movements.
+
 ###System Requirements
 * Matlab 2012b or higher recommended (will also run on 6.1 or higher)
 * Statistics Toolbox
 * Parallel Processing Toolbox (recommended)
 
-Compiled binaries are included for:
-* 32 bit Windows
-* 32 bit Linux
-* 64 bit Windows
+Compiled 32 and 64 bit binaries are included for Windows and Linux.
 
-A 64 bit version for Windows will be added in a future update. Source code is included for the impatient and adventurous.
+Source code is included for the impatient and adventurous that would like to port binaries to Mac.
 
-Note that some features of the application does not depend on the compiled parts of the code.
+Note that many features of the application does not depend on the compiled parts of the code and will run on any operating system.
 
 ###Report bugs
 Please report errors, bugs and feature requests using the Issues tracker:

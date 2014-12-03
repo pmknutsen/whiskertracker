@@ -1,11 +1,12 @@
 function sMovies = wt_select_directory(sPath)
 % WT_SELECT_DIRECTORY
 % Select a directory on disk as the current directory to load AVI movies
-% from. All AVI movies in this directory are listed in File -> Movies
+% from. All AVI movies in this directory are listed in File -> Movies.
+%
 
 global g_tWT
 
-if ~exist('sPath')
+if ~exist('sPath', 'var')
     if ~isempty(g_tWT.AccessedPaths), sCurrPath = g_tWT.AccessedPaths{1};
     else sCurrPath = '0'; end
     sPath = uigetdir(sCurrPath, 'Select movie directory');
@@ -16,16 +17,17 @@ if ~sPath, return, end
 cd(sPath) % change path to last selected
 
 % Return immediately if user cancels
-if ~sPath return; end
+if ~sPath, return; end
 
-% Build list of AVI files
+% Build list of AVI and BIN files
 sFiles = dir(wt_check_path(sprintf('%s\\*.avi', sPath)));
+sFiles = [sFiles; dir(wt_check_path(sprintf('%s\\*.bin', sPath)))];
 
 % Build list of MAT files
 sMATFiles = dir(wt_check_path(sprintf('%s\\*.mat', sPath)));
 
 % Error if there are no movies in chosen directory
-if isempty(sFiles) && isempty(sMATFiles)
+if isempty(sFiles) && isempty(sMATFiles) && isempty(sBINFiles)
     warndlg('No video files were found in the chosen directory.', 'No movies found')
     return
 elseif isempty(sFiles) && ~isempty(sMATFiles)
