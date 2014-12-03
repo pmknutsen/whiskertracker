@@ -1,6 +1,6 @@
 ###WhiskerTracker
 
-WhiskerTracker is a Matlab based application for tracking head, whisker and limb movements in high-speed movies of freely moving or restrained rodents. 
+WhiskerTracker is a Matlab based application for tracking **head**, **whisker** and **limb** movements in high-speed movies of freely moving or restrained rodents. 
 
 Multiple tracking modes are supported through a graphical user interface with a small screen footprint. Choose from many pre-processing routines to track any high-speed movie automatically. Manual error correction is built-in.
 
