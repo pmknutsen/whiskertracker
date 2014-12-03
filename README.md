@@ -27,7 +27,7 @@ Increase tracking speeds significantly by batch processing simultaneously with m
 * Label joints to track movements and rotations fore- and hindlimbs
 * Label head in 3 locations and track head movements.
 
-<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/LimbTracking.png" alt="Drawing" height="100"/>
+<img src="https://github.com/pmknutsen/whiskertracker/blob/master/examples/LimbTracking.png" alt="Drawing" height="300"/>
 
 ###System Requirements
 * Matlab 2012b or higher recommended (will also run on 6.1 or higher)
