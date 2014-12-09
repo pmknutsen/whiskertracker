@@ -29,7 +29,7 @@ end
 
 % Process alternative file formats, eg. Streamer BIN files.
 if ~strcmpi(sExt, '.avi')
-    eval(sprintf('mFrames = wt_load_%s(sFile, vFrames);', sExt))
+    eval(sprintf('mFrames = wt_load_%s(sFile, vFrames);', sExt(2:end)))
     return
 end
 

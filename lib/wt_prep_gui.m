@@ -116,12 +116,13 @@ if ~isempty(g_tWT.Movies)
         
     % Track markers menu
     hLabels = uimenu(hFrameWin, 'Label', 'Markers');
-    uimenu(hFrameWin, 'Label','New Marker...', 'Parent', hLabels, 'Callback', ['wt_mark_whisker_and_label;'], 'accelerator', 'M');
-    uimenu(hFrameWin, 'Label','Track Markers', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Marker Filter...', 'Parent', hLabels, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
-    uimenu(hFrameWin, 'Label','Clear', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','New...', 'Parent', hLabels, 'Callback', ['wt_mark_whisker_and_label;'], 'accelerator', 'M');
+    uimenu(hFrameWin, 'Label','Track', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0,''continue-all'',0); wt_batch_redo(''wt_track_whisker_label(0,''''continue-all'''',0)'')'], 'checked', 'on');
+    uimenu(hFrameWin, 'Label','Delete All', 'Parent', hLabels, 'Callback', ['wt_track_whisker_label(0, ''delete-all''); wt_batch_redo(''wt_track_whisker_label(0,''''delete-all'''');'')'], 'checked', 'on');
+    
+    uimenu(hFrameWin, 'Label','Show Labels', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity', 'separator', 'on')
+    uimenu(hFrameWin, 'Label','Filter Settings...', 'Parent', hLabels, 'Callback', ['global g_tWT; g_tWT.LabelFilter=wt_create_filter(g_tWT.LabelFilter);']);
     uimenu(hFrameWin, 'Label','Extend As Whiskers', 'Parent', hLabels, 'Callback', ['wt_track_whiskers_with_labels('''','''',[],[])'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Marker Names', 'Parent', hLabels, 'Callback', 'wt_toggle_show_label_identity')
     
     % Head related menu items
     hHead = uimenu(hFrameWin, 'Label', 'Head');
@@ -145,7 +146,7 @@ if ~isempty(g_tWT.Movies)
     uimenu(hFrameWin, 'Label','Rotate 90° Counter-Clockwise', 'Parent', hImage, 'Callback', ['wt_rotate_frame(-1); wt_batch_redo(''wt_rotate_frame(-1)'')'], 'accelerator', 'a', 'checked', 'on');
     uimenu(hFrameWin, 'Label','Flip Vertically', 'Parent', hImage, 'Callback', ['wt_flip_frame(''updown''); wt_batch_redo(''wt_flip_frame(''''updown'''')'')'], 'checked', 'on');
     uimenu(hFrameWin, 'Label','Flip Horizontally', 'Parent', hImage, 'Callback', ['wt_flip_frame(''leftright''); wt_batch_redo(''wt_flip_frame(''''leftright'''')'')'], 'checked', 'on');
-    uimenu(hFrameWin, 'Label','Refresh', 'Parent', hImage, 'Callback', ['wt_prep_gui; wt_display_frame'], 'Separator', 'on', 'accelerator', 'R');
+    uimenu(hFrameWin, 'Label','Refresh', 'Parent', hImage, 'Callback', ['wt_fix_data;wt_prep_gui;wt_display_frame'], 'Separator', 'on', 'accelerator', 'R');
     uimenu(hFrameWin, 'Label','Hide', 'Parent', hImage, 'Callback', ['wt_toggle_imageshow'], 'accelerator', 'H');
     uimenu(hFrameWin, 'Label','Go To Frame...', 'Parent', hImage, 'Callback', @GoToFrame, 'accelerator', 'G');
     

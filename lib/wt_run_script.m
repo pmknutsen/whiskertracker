@@ -60,6 +60,7 @@ if sFile == 0, return, end
 sCurrDir = pwd;
 cd(sPath)
 
+wt_fix_data % fix data errors before running script
 eval([sFile(1:end-2) '(g_tWT);'])
 
 cd(sCurrDir)
