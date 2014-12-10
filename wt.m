@@ -22,7 +22,7 @@ function wt
 
 clc
 disp('WhiskerTracker')
-disp('Copyright (C) 2005-2013 Per M Knutsen <pmknutsen@gmail.com>')
+disp('Copyright (C) 2005-2014 Per M Knutsen <pmknutsen@gmail.com>')
 disp('This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are')
 disp('are welcome to redistribute it under certain conditions; see LICENSE for details.')
 

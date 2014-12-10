@@ -70,7 +70,7 @@ switch sOption % if neither option is met, continue with automatic tracking
             vObjIndx = size(g_tWT.MovieInfo.WhiskerLabels{nWhisker}, 3) + 1;
         end
         g_tWT.MovieInfo.WhiskerLabels{nWhisker}(nCurrFrame, 1:2, vObjIndx) = [nX nY];
-        g_tWT.MovieInfo.WhiskerLabels{nWhisker}(find(g_tWT.MovieInfo.WhiskerLabels{nWhisker}==0)) = NaN; % replace zeros with NaNs
+        g_tWT.MovieInfo.WhiskerLabels{nWhisker}(g_tWT.MovieInfo.WhiskerLabels{nWhisker} == 0) = NaN; % replace zeros with NaNs
         wt_display_frame
         return
 end
@@ -96,7 +96,7 @@ while nCurrFrame <= nLastFrame
 
     % Load frame buffer
     vBufferedFrames = (nCurrFrame+1):(nCurrFrame+g_tWT.MovieInfo.NoFramesToLoad);
-    vBufferedFrames(find(vBufferedFrames > g_tWT.MovieInfo.NumFrames)) = [];
+    vBufferedFrames(vBufferedFrames > g_tWT.MovieInfo.NumFrames) = [];
     if isempty(vBufferedFrames), break, end
     mFrames = wt_load_avi(g_tWT.MovieInfo.Filename, vBufferedFrames); % load frame buffer
     
@@ -142,8 +142,8 @@ while nCurrFrame <= nLastFrame
             end
         else
             % Movie with no head-movements
-            try [mFrame, mImgCroppedOnly] = wt_image_preprocess(mFrame);
-            catch wt_error('Failed pre-processing image. Try Debug.'); end
+            try [mFrame, ~] = wt_image_preprocess(mFrame);
+            catch, wt_error('Failed pre-processing image. Try Debug.'); end
             if g_tWT.MovieInfo.Invert == 1, mFrame = mFrame .* -1; end
         end
 
@@ -176,7 +176,7 @@ while nCurrFrame <= nLastFrame
             
             [vNewPos, nScore, nScoreStd] = wt_track_spot(mUseFrame.*-1, [vX vY], [], g_tWT.LabelFilter.Filter, 0, g_tWT.LabelFilter.Threshold);
 
-            if isempty(vNewPos) % if no new position was found (e.g. user clicked too far from whisker), use position of last frame
+            if isempty(vNewPos) || all(isnan(vNewPos)) % if no new position was found (e.g. user clicked too far from whisker), use position of last frame
                 vNewPos = g_tWT.MovieInfo.WhiskerLabels{nWhisker}(nCurrFrame-1, :, vObjIndx);
             end
             g_tWT.MovieInfo.WhiskerLabels{nWhisker}(nCurrFrame, :, vObjIndx) = vNewPos;
