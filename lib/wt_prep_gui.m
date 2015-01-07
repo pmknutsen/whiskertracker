@@ -9,7 +9,7 @@ global g_tWT
 g_tWT.BatchMode = 0;
 
 hFrameWin = findobj('Tag', 'WTMainWindow');
-set(hFrameWin, 'color', [.8 .8 .8])
+set(hFrameWin, 'color', [.8 .8 .8], 'renderer', 'painters')
 
 figure(hFrameWin);
 clf;
