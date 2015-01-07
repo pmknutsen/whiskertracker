@@ -174,11 +174,24 @@ while nCurrFrame <= nLastFrame
                 end
             end
             
-            [vNewPos, nScore, nScoreStd] = wt_track_spot(mUseFrame.*-1, [vX vY], [], g_tWT.LabelFilter.Filter, 0, g_tWT.LabelFilter.Threshold);
+            [vNewPos, nScore, ~] = wt_track_spot(mUseFrame.*-1, [vX vY], [], g_tWT.LabelFilter.Filter, 0, g_tWT.LabelFilter.Threshold);
 
-            if isempty(vNewPos) || all(isnan(vNewPos)) % if no new position was found (e.g. user clicked too far from whisker), use position of last frame
-                vNewPos = g_tWT.MovieInfo.WhiskerLabels{nWhisker}(nCurrFrame-1, :, vObjIndx);
+            % If the new position is not found, try to interpolate. If
+            % there are too few prior positions known, use last position.
+            if isnan(nScore) || isempty(vNewPos) || all(isnan(vNewPos))
+                % Get 10 last positions
+                if nCurrFrame > 10
+                    iT = (nCurrFrame-10):(nCurrFrame-1);
+                    mPrior = g_tWT.MovieInfo.WhiskerLabels{nWhisker}(iT, :, vObjIndx);
+                    vNewPos(1) = interp1(iT, mPrior(:,1), nCurrFrame, 'linear', 'extrap');
+                    vNewPos(2) = interp1(iT, mPrior(:,2), nCurrFrame, 'linear', 'extrap');
+                end
+                % Use last known position if interpolation failed
+                if any(isnan(vNewPos))
+                    vNewPos = g_tWT.MovieInfo.WhiskerLabels{nWhisker}(nCurrFrame-1, :, vObjIndx);
+                end
             end
+            
             g_tWT.MovieInfo.WhiskerLabels{nWhisker}(nCurrFrame, :, vObjIndx) = vNewPos;
             nButton = 1;
             while nButton == 1 % loop until user clicks right mouse-button
