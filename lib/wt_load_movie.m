@@ -187,6 +187,10 @@ end
 % Reset the averaged frame
 wt_subtract_bg_frame('reset');
 
+% Initialize image buffer
+g_tWT.CurrentFrameBuffer.Img   = [];
+g_tWT.CurrentFrameBuffer.Frame = 1;
+
 % Load previously collected data
 % If that fails (e.g. if there is none), then attempt to load the default
 % parameters file (wt_default_parameteres)
@@ -216,10 +220,6 @@ end
 if ~isfield(g_tWT.MovieInfo, 'CalBarLength'), g_tWT.MovieInfo.CalBarLength = []; end
 if ~isfield(g_tWT.MovieInfo, 'CalibCoords'), g_tWT.MovieInfo.CalibCoords = [0 0;0 0];    end
 g_tWT.MovieInfo.FilenameUncompressed = [];
-
-% Initialize image buffer
-g_tWT.CurrentFrameBuffer.Img   = [];
-g_tWT.CurrentFrameBuffer.Frame = 1;
 
 % Display frame number 1, or the first frame where head-position is known
 wt_prep_gui

@@ -22,7 +22,9 @@ if ~isempty(p_nClock)
     p_nClock = clock;
     p_vFPS = [p_vFPS length(vSR)/nElapsedTime]; % tracking speed, fps
     set(findobj('tag','fps'), 'label', sprintf('Tracking speed: %.1f fps', mean(p_vFPS)))
-else p_nClock = clock; end
+else
+    p_nClock = clock;
+end
 
 if isempty(p_nAutoclear) p_nAutoclear = 500;
 else
@@ -32,7 +34,7 @@ else
 end
 
 % Figure
-if isempty(p_hSRWin) | ~ishandle(p_hSRWin)
+if isempty(p_hSRWin) || ~ishandle(p_hSRWin)
     p_hSRWin = figure;
     set(p_hSRWin, 'Name', 'S/N  Use mouse to set threshold', ...
         'MenuBar', 'none', ...
@@ -54,7 +56,8 @@ if isempty(hAxes)
         'xcolor', 'w', 'ycolor', 'w', ...
         'ButtonDownFcn', @SetThreshold, ...
         'tag', 'wt_sn_axes' )
-    ylabel('S/N'); xlabel('Time (frames)')
+    ylabel('S/N');
+    xlabel('Time (frames)')
 end
 
 % Plot
@@ -62,19 +65,23 @@ hLines = findobj(hAxes(end), 'type', 'line'); % there are two line objects: S/N 
 if isempty(hLines)
     hLines(1) = line(1,1);
     hThreshLine = line(0,2);
-    set(hLines(1), 'Tag', 'SR', 'Marker', '.', 'color', [0 .8 0]);
+    set(hLines(1), 'Tag', 'SR', 'linestyle', '.', 'Marker', '.', 'color', [0 .8 0]);
     set(hThreshLine, 'Tag', 'THRESH', 'color', 'r', 'LineStyle', ':');
 end
 
 % Return if the input is empty
 hSR = findobj('tag','SR');
-if isempty(vSR), vSR = 0;
+if isempty(vSR)
+    vSR = 0;
 else
     hSR = hSR(1);
     vSR = [get(hSR, 'ydata') vSR];
+    %if length(vSR) > 1
+    %    vSR(1) = [];
+    %end
 end
 
-set(hAxes, 'ylim', [min(vSR)-2 max(vSR)+2])
+set(hAxes, 'ylim', [0 max(vSR)+2])
 set(findobj('tag','SR'), 'ydata', vSR, 'xdata', 0:length(vSR)-1)
 vYdata = get(findobj('tag','THRESH'), 'ydata');
 if iscell(vYdata), vYdata = vYdata{1}; end
@@ -85,7 +92,7 @@ hLines = get(hAxes(end), 'children'); % there are two line objects: S/N and THRE
 % Evaluate SR
 vThresh = get(findobj('tag','THRESH'), 'ydata');
 if iscell(vThresh) vThresh = vThresh{1}; end
-if (vSR(end) <= vThresh(end)) & vSR(end)~=0
+if (vSR(end) <= vThresh(end)) && vSR(end)~=0
     beep
     g_tWT.StopProc = 1;
 end

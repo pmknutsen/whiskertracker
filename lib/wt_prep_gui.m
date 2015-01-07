@@ -346,12 +346,16 @@ if strcmp(' ', sKey)
 end
 return
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function GoToFrame(varargin)
 sF = inputdlg('Go to frame', 'Go to frame', 1);
 if isempty(sF), return
 else wt_display_frame(str2num(char(sF))); end
 return
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function GotoFirstFrame(varargin)
 global g_tWT
 if ~isempty(g_tWT.MovieInfo.Nose)
@@ -360,12 +364,15 @@ else f = 1; end
 wt_display_frame(f(1));
 return
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function GotoLastFrame(varargin)
 global g_tWT
+f = g_tWT.MovieInfo.NumFrames;
 if ~isempty(g_tWT.MovieInfo.SplinePoints)
-    f = size(g_tWT.MovieInfo.SplinePoints, 3);
-else
-    f = g_tWT.MovieInfo.NumFrames;
+    if size(g_tWT.MovieInfo.SplinePoints, 3) > 1
+        f = size(g_tWT.MovieInfo.SplinePoints, 3);
+    end
 end
 wt_display_frame(f);
 return

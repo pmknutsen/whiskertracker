@@ -12,7 +12,7 @@ function wt_display_frame( varargin )
 %
 
 global g_tWT
-if isempty(g_tWT) return; end
+if isempty(g_tWT), return; end
 
 persistent nCurrentFrame % NOTE: is emptied when this file is changed!!!
 if isempty(nCurrentFrame), nCurrentFrame = 1; end % show 1st frame by default
@@ -96,8 +96,6 @@ else
     end
 end
 
-%axes(g_tWT.FrameAx)
-
 % Update image axes with new video frame (or blank)
 if g_tWT.HideImage
     if isempty(hImg)
@@ -133,10 +131,9 @@ if ~isempty(g_tWT.MovieInfo.SplinePoints)
         wt_draw_whisker_label(w, nCurrentFrame);
     end
 end
-hold off;
+hold off
 
 % Plot outlines
-%axes(g_tWT.FrameAx); hold on
 hold(g_tWT.FrameAx, 'on');
 if isfield(g_tWT.MovieInfo, 'Outlines')
     for o = 1:length(g_tWT.MovieInfo.Outlines)
@@ -164,7 +161,6 @@ else delete(hHead), end
 if ~isempty(g_tWT.MovieInfo.RefLine)
     hObj = findobj(g_tWT.FrameAx, 'Tag', 'reference_line');
     if isempty(hObj)    % plot reference lince if it hasn't already been
-        %axes(g_tWT.FrameAx);
         vLine = interp1(g_tWT.MovieInfo.RefLine(:,2), g_tWT.MovieInfo.RefLine(:,1), 1:size(mFrame,1), 'linear', 'extrap');
         hold on;
         hLine = plot(g_tWT.FrameAx, vLine, 1:size(mFrame,1), 'r', 'linewidth', 1);
@@ -182,33 +178,6 @@ if ~isempty(g_tWT.MovieInfo.RefLine)
     end
 end
 
-% Place text that marks direction
-%if g_tWT.MovieInfo.Invert, vTextColor = [1 1 1];
-%else vTextColor = [0 0 0]; end
-%hTxtDir = findobj(g_tWT.FrameAx, 'Type', 'text', 'tag', 'antpost');
-%if ~bHeadIsTracked
-%    if isempty(hTxtDir)
-%        hTxtDir = text(size(mFrame,2)/2, size(mFrame,1)-4, 'Nose', 'parent', g_tWT.FrameAx);
-%    end
-%    set(hTxtDir, 'color', vTextColor, ...
-%        'fontsize', 10, ...
-%        'horizontalalignment', 'center', ...
-%        'fontweight', 'bold', ...
-%        'tag', 'antpost' )
-%else
-%    % If head is tracked, show instead strings that indicate left and right
-%    % side of rat's head
-%    if g_tWT.DisplayMode
-%        hTxtSide = findobj(g_tWT.FrameAx, 'Type', 'text', 'tag', 'side');
-%        delete(hTxtSide);
-%        hTxtSide = text([size(mFrame,2)/2-5 size(mFrame,2)-5], [10 10], {'R' 'L'}, 'parent', g_tWT.FrameAx);
-%        set(hTxtSide(:), 'color', vTextColor, ...
-%            'fontsize', 16, ...
-%            'horizontalalignment', 'right', ...
-%            'fontweight', 'bold', 'tag', 'side')    
-%    end
-%end
-
 % Text above image
 sFilename = g_tWT.MovieInfo.Filename;
 vIndx = [strfind(sFilename, '\') strfind(sFilename, '/')];
@@ -217,17 +186,6 @@ hTxtHeader = findobj(g_tWT.FrameAx, 'Type', 'text', 'tag', 'movieandframe');
 sStr = sprintf('%s    Frame: %d/%d (%.1f FPS)', sFilename, ...
     round(nCurrentFrame), g_tWT.MovieInfo.NumFrames, g_tWT.MovieInfo.FramesPerSecond);
 wt_set_status(sStr);
-%if isempty(hTxtHeader)
-%    hTxtHeader = text(1, -5, sStr, ...
-%        'FontSize', 8, ...
-%        'FontWeight', 'normal', ...
-%        'Interpreter', 'none', ...
-%        'parent', g_tWT.FrameAx, ...
-%        'Tag', 'movieandframe' );
-%else
-%    set(hTxtHeader, 'string', sprintf('%s    Frame: %d/%d (%.1f FPS)', sFilename, ...
-%        round(nCurrentFrame), g_tWT.MovieInfo.NumFrames, g_tWT.MovieInfo.FramesPerSecond))
-%end
 
 % Trigger overlays
 if g_tWT.TriggerOverlays
@@ -317,20 +275,15 @@ set(hMarkers, 'xdata', [nCurrentFrame nCurrentFrame].*(1000/g_tWT.MovieInfo.Fram
 
 % Set image and axis properties
 try set(hImage, 'HitTest', 'Off'); end
-%vXlim = get(g_tWT.FrameAx, 'xlim');
-%vYlim = get(g_tWT.FrameAx, 'ylim');
 axis(g_tWT.FrameAx, 'image')
 set(g_tWT.FrameAx, 'Visible', 'off', ...
     'box', 'on', ...
+    'xlim', [0 max(get(g_tWT.FrameAx, 'xlim'))], ...
+    'ylim', [0 max(get(g_tWT.FrameAx, 'ylim'))], ...
     'xtick', [], ...
     'ytick', [], ...
     'xticklabel', [], ...
     'yticklabel', [] );
-    %'xlim', vXlim, ...
-    %'ylim', vYlim )
-    % following lines commented out to permit persistent zoom
-    %'xlim', [0 size(mFrame, 2)], ...
-    %'ylim', [0 size(mFrame, 1)] )
 
 % Put image to back of axes
 hImg = findobj(g_tWT.FrameAx, 'Type', 'image');

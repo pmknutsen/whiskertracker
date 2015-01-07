@@ -15,6 +15,22 @@ try
     end
     sFilename = sprintf('%s.mat', g_tWT.MovieInfo.Filename(vStrIndx));
 
+    % If sFilename does not exist, this file may have copied to a different
+    % system with a different directory structure as compared to when it
+    % was tracked. Check if 2 ascending directories match the filename from
+    % the current directory; if there is a match, then update the filename
+    if ~exist(sFilename, 'file')
+        iSep = unique([findstr(sFilename, '\') findstr(sFilename, '/')]);
+        sFilename(iSep) = filesep;
+        if ~isempty(iSep)
+            sRelFilename = sprintf('..%s..%s', filesep, sFilename(iSep(end-2):end));
+            [sRelPath, sRelFile, eExt] = fileparts(sRelFilename);
+            if ~isempty(dir(sRelFilename)) % file match
+                sFilename = sprintf('%s%s%s%s', pwd, filesep, sRelFile, eExt);
+            end
+        end
+    end
+    
     % Let user select data file to load (otherwise load default)
     if nargin==1
         switch varargin{1}

@@ -30,13 +30,13 @@ sMATFiles = dir(wt_check_path(sprintf('%s\\*.mat', sPath)));
 if isempty(sFiles) && isempty(sMATFiles) && isempty(sBINFiles)
     warndlg('No video files were found in the chosen directory.', 'No movies found')
     return
-elseif isempty(sFiles) && ~isempty(sMATFiles)
-    sAns = questdlg('No AVI files were found in the chosen directory. Would you like to attempt loading available MAT files instead?', 'No AVI files found', ...
+elseif ~isempty(sMATFiles)
+    % Ask to load any MAT files when found (and check they are WT files)
+    sAns = questdlg('Would you like to load MAT files in this directory as well?', 'Load MAT files', ...
         'Yes', 'No', 'Yes');
     switch sAns
         case 'Yes'
-            % Iterate over available MAT files and check they are in WT
-            % format
+            % Iterate over available MAT files and check they are in WT format
             vIndx = [];
             for f = 1:length(sMATFiles)
                tTMP = load(wt_check_path(sprintf('%s\\%s', sPath, sMATFiles(f).name)));
@@ -44,9 +44,7 @@ elseif isempty(sFiles) && ~isempty(sMATFiles)
                    vIndx = [vIndx f];
                end
             end
-            sFiles = sMATFiles(vIndx);
-        case 'No'
-            return
+            sFiles = [sFiles; sMATFiles(vIndx)];
     end
 end
 
