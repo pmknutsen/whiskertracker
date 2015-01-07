@@ -9,6 +9,7 @@ function bStop = wt_plot_signal_noise(vSR)
 %  wt_plot_signal_noise(N)  : add N to XDATA in SR window
 %  wt_plot_signal_noise([]) : reset SR plot
 
+
 global g_tWT
 
 persistent p_hSRWin p_nAutoclear p_nClock p_vFPS
