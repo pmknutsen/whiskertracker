@@ -109,17 +109,19 @@ wt_set_status('Tracking average whisker position. Press Stop to abort.')
 nStepCount = 0;
 nStep = 50;
 
-% TODO Pre-load X filed
 vTrackFrames = 1:g_tWT.MovieInfo.NoFramesToLoad:numframes;
 for nStepRange = vTrackFrames
     % Prevent frame-range not to exceed actual max number of frames
     vFrames = nStepRange:nStepRange + g_tWT.MovieInfo.NoFramesToLoad-1;
-    vFrames = vFrames(find(vFrames <= numframes));
+    vFrames = vFrames(vFrames <= numframes);
     
     % Load frames in current range
     % if this fails, video may be corrupted etc
-    try mFrames = wt_load_avi(vidfile, vFrames);
-    catch, break, end
+    try
+        mFrames = wt_load_avi(vidfile, vFrames);
+    catch
+        break
+    end
 
     % Iterate over frames in current range
     for nFrame = 1:length(vFrames)

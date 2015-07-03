@@ -78,10 +78,16 @@ if strcmp(sOption, 'save')
     % Compressor
     sCompressor = questdlg('Select video compression method', 'Select compressor', 'None','Indeo5', 'Cinepak', 'None');
 
+    % Output framerate
+    sFramerateOut = inputdlg(sprintf('Enter output frame rate (original is %d frames/s)', g_tWT.MovieInfo.FramesPerSecond), ...
+        'Framerate');
+    nFramerateOut = str2double(sFramerateOut);
+    if isempty(nFramerateOut), return, end
+
     % Create AVI stream
     tMov = avifile([sFilepath sFilename], ...
         'Compression', sCompressor, ...
-        'Fps', g_tWT.MovieInfo.FramesPerSecond, ... % save at original framerate
+        'Fps', nFramerateOut, ...
         'Quality', 80 );
 
     % Ask for end frame
