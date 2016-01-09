@@ -17,8 +17,13 @@ persistent p_fQuadFun
 if isempty(p_fQuadFun)
     p_fQuadFun = inline('1 - exp( -(x-b(1)).^2 / (2*b(2).^2) )', 'b', 'x');
 end
-if g_tWT.ParallelMode && exist('matlabpool', 'file')
-    nPoolSize = matlabpool('size');
+if g_tWT.ParallelMode
+    if exist('parpool', 'file')
+        parobj = gcp('nocreate');
+        nPoolSize = parobj.NumWorkers;
+    elseif exist('matlabpool', 'file')
+        nPoolSize = matlabpool('size');
+    end
 else
     nPoolSize = 0;
 end

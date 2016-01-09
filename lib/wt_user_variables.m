@@ -17,7 +17,6 @@ if ~isempty(varargin)
     end
 end
 
-
 global g_tWT;
 
 % Check if variables window is already open. If YES, then retrieve and save
@@ -30,7 +29,7 @@ end
 
 hFig = figure('closeRequestFcn', 'set(gcbf,''userdata'',''closed'')');
 cColumnNames = {'Variable', 'Value', 'Type'};
-cColumnFormat = {'char', 'char', {'String','Number'}}; 
+cColumnFormat = {'char', 'char', {'String', 'Number'}}; 
 cColumnEditable =  [true true true];
 
 cData = repmat({''},200,3);
@@ -54,7 +53,6 @@ set(hFig, 'CloseRequestFcn', 'wt_user_variables')
 
 return
 
-
 %%%% Retrieve and save user variables
 function RetrieveUserVariables
 global g_tWT
@@ -72,7 +70,7 @@ end
 
 g_tWT.MovieInfo.tUserVariables = struct([]); % clear variables
 for c = 1:size(cData, 1)
-    if isempty(cData{c,1}) | isempty(cData{c,2}), continue, end
+    if isempty(cData{c,1}) || isempty(cData{c,2}), continue, end
     g_tWT.MovieInfo.tUserVariables(end+1).sVariable = cData{c, 1};
     g_tWT.MovieInfo.tUserVariables(end).sValue = cData{c, 2};
     g_tWT.MovieInfo.tUserVariables(end).sType = cData{c, 3};

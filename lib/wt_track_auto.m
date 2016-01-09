@@ -13,13 +13,24 @@ if ~isfield(g_tWT, 'RepositionOnly')
 end
 if ~g_tWT.DisplayMode, wt_toggle_display_mode, end
 
-% Start matlabpool if not open already
+% Start parpool (matlabpool in older versions) if not open already
 if g_tWT.ParallelMode
     try
-        if matlabpool('size') == 0
-            wt_set_status('Warning: Matlab worker pool not initialized. Starting pool now...')
-            matlabpool; % open default pool
-            wt_set_status(sprintf('Matlab worker pool started with %d workers.', matlabpool('size')))
+        if exist('parpool', 'file')
+            if isempty(gcp('nocreate'))
+                wt_set_status('Warning: Matlab worker pool not initialized. Starting pool now...')
+                cluster = parcluster('local');
+                cluster .NumWorkers = 4;
+                parpool(cluster, cluster .NumWorkers); % open default pool
+                parobj = gcp('nocreate');
+                wt_set_status(sprintf('Matlab worker pool started with %d workers.', parobj.NumWorkers))
+            end
+        elseif exist('matlabpool', 'file')
+            if matlabpool('size') == 0
+                wt_set_status('Warning: Matlab worker pool not initialized. Starting pool now...')
+                matlabpool; % open default pool
+                wt_set_status(sprintf('Matlab worker pool started with %d workers.', matlabpool('size')))
+            end
         end
     catch
             wt_set_status('Error: Failed starting Matlab worker pool.')

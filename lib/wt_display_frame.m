@@ -114,7 +114,7 @@ else
         colormap('gray');
         vImgSize = size(get(hImage, 'cdata'));
     else
-        set(hImg, 'cdata', mFrame);
+        set(hImg, 'cdata', mFrame - min(mFrame(:)));
         % Set axis to real-size
         vImgSize = size(get(hImg, 'cdata'));
     end
